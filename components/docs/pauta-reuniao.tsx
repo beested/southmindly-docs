@@ -1,7 +1,8 @@
-'use client';
+﻿'use client';
 
 import { AgendaItem, PautaData } from '@/types/docs';
 import { useCallback, useState } from 'react';
+import { DatePicker } from '@/components/ui/date-picker';
 
 interface PautaReuniaoProps {
   onBack: () => void;
@@ -18,7 +19,7 @@ const generateDocId = (): string => {
   return `SM-${y}${m}${d}-${rand}`;
 };
 
-// ── Sub-components ──────────────────────────────────────────────
+// â”€â”€ Sub-components â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
 interface FieldProps {
   label: string;
@@ -124,20 +125,20 @@ function AgendaItemRow({
         <input
           value={item.titulo}
           onChange={(e) => onChange({ ...item, titulo: e.target.value })}
-          placeholder="Título do ponto de pauta..."
+          placeholder="TÃ­tulo do ponto de pauta..."
           className="bg-transparent border-none outline-none text-[#E8EAF0] text-sm font-sans font-medium w-full placeholder:text-[#6B7280] placeholder:opacity-55"
         />
         <div className="flex gap-2.5">
           <input
             value={item.responsavel}
             onChange={(e) => onChange({ ...item, responsavel: e.target.value })}
-            placeholder="Responsável"
+            placeholder="ResponsÃ¡vel"
             className="bg-[#0D0F1488] border border-[#1E2130] rounded-md px-2.5 py-1.5 text-[#9CA3AF] text-xs font-mono outline-none flex-1 placeholder:text-[#6B7280] placeholder:opacity-55"
           />
           <input
             value={item.duracao}
             onChange={(e) => onChange({ ...item, duracao: e.target.value })}
-            placeholder="Duração"
+            placeholder="DuraÃ§Ã£o"
             className="bg-[#0D0F1488] border border-[#1E2130] rounded-md px-2.5 py-1.5 text-[#9CA3AF] text-xs font-mono outline-none w-[150px] placeholder:text-[#6B7280] placeholder:opacity-55"
           />
         </div>
@@ -145,7 +146,7 @@ function AgendaItemRow({
         <textarea
           value={topicsText}
           onChange={(e) => updateTopics(e.target.value)}
-          placeholder="Tópicos (um por linha)..."
+          placeholder="TÃ³picos (um por linha)..."
           rows={3}
           className="bg-[#0D0F1488] border border-[#1E2130] rounded-md px-2.5 py-1.5 text-[#9CA3AF] text-xs font-sans outline-none w-full resize-y placeholder:text-[#6B7280] placeholder:opacity-55"
         />
@@ -163,7 +164,7 @@ function AgendaItemRow({
   );
 }
 
-// ── Preview (light document) ─────────────────────────────────────
+// â”€â”€ Preview (light document) â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
 interface PreviewProps {
   data: PautaData;
@@ -174,12 +175,12 @@ function Preview({ data, docId }: PreviewProps) {
   return (
     <div
       id="preview-doc"
-      className="bg-white rounded-xl p-[52px_56px] font-sans text-[#111] max-w-[720px] mx-auto shadow-[0_4px_48px_rgba(0,0,0,0.35)] relative overflow-hidden print:shadow-none print:m-0 print:max-w-none print:w-full print:rounded-none print:p-[40px]"
+      className="bg-white rounded-xl p-[52px_56px] pb-[132px] font-sans text-[#111] max-w-[720px] mx-auto shadow-[0_4px_48px_rgba(0,0,0,0.35)] relative overflow-hidden print:shadow-none print:m-0 print:max-w-none print:w-full print:rounded-none print:p-[40px] print:pb-[120px]"
     >
       {/* Header */}
       <div className="flex justify-between items-start mb-6 pb-4 border-b-2 border-purple-800">
         <h1 className="font-sans text-4xl font-bold text-black m-0 leading-tight">
-          Pauta de Reunião
+          Pauta de ReuniÃ£o
         </h1>
         <img src="/logo-icon.png" alt="SouthMindly" className="h-12 w-auto" />
       </div>
@@ -193,14 +194,14 @@ function Preview({ data, docId }: PreviewProps) {
         <div className="text-right flex flex-col items-end">
           <div className="flex gap-1">
             <span className="font-bold">Data:</span>
-            <span>{data.data || '—'}</span>
+            <span>{data.data || 'â€”'}</span>
           </div>
           <div className="flex gap-1">
             <span className="font-bold">Horario:</span>
-            <span>{data.horario || '—'}</span>
+            <span>{data.horario || 'â€”'}</span>
           </div>
           <div className="italic mt-1">
-            {data.local || 'Google Meet - Gravação da reunião'}
+            {data.local || 'Google Meet - GravaÃ§Ã£o da reuniÃ£o'}
           </div>
         </div>
       </div>
@@ -209,7 +210,7 @@ function Preview({ data, docId }: PreviewProps) {
       {data.objetivo && (
         <div className="mb-8">
           <h2 className="text-xl font-bold mb-3 text-black">
-            Objetivos dessa reunião:
+            Objetivos dessa reuniÃ£o:
           </h2>
           <ul className="list-disc pl-5 space-y-1">
             {data.objetivo
@@ -252,7 +253,7 @@ function Preview({ data, docId }: PreviewProps) {
                 </ul>
               ) : (
                 <p className="text-sm text-gray-500 italic pl-5">
-                  Sem tópicos detalhados.
+                  Sem tÃ³picos detalhados.
                 </p>
               )}
             </div>
@@ -261,18 +262,21 @@ function Preview({ data, docId }: PreviewProps) {
       </div>
 
       {/* Footer / Page Number */}
-      <div className="fixed bottom-0 left-0 w-full border-t border-gray-300 mx-10 mb-10 pt-2 flex justify-between text-[10px] font-bold text-black print:absolute print:bottom-10 print:left-10 print:right-10 print:mx-0">
-        <div>
+      <div
+        id="preview-doc-footer"
+        className="fixed bottom-10 left-14 right-14 z-50 bg-white border-t border-gray-300 pt-2 flex items-center justify-between gap-4 text-[10px] font-bold text-black print:fixed print:bottom-10 print:left-10 print:right-10"
+      >
+        <div className="min-w-0 truncate">
           PAUTA REUNIÃO | {data.titulo ? data.titulo.toUpperCase() : 'GERAL'} -{' '}
           {new Date().getFullYear()}
         </div>
-        <div>Pág. 1/1</div>
+        <div className="shrink-0 whitespace-nowrap">Pág. 1/1</div>
       </div>
     </div>
   );
 }
 
-// ── Main Component ───────────────────────────────────────────────
+// â”€â”€ Main Component â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
 const EMPTY_DATA: PautaData = {
   titulo: '',
@@ -358,7 +362,7 @@ export default function PautaReuniao({ onBack }: PautaReuniaoProps) {
             <div className="w-px h-5 bg-[#1E2130]" />
             <div>
               <div className="text-[10px] font-mono text-[#6B7280] tracking-[0.1em] uppercase">
-                Pauta de Reunião
+                Pauta de ReuniÃ£o
               </div>
               <div className="text-[13px] font-sans text-[#E8EAF0] font-medium">
                 {data.titulo || 'Novo documento'}
@@ -397,33 +401,29 @@ export default function PautaReuniao({ onBack }: PautaReuniaoProps) {
             {/* Left panel: form */}
             <div className="border-r border-[#1E2130] p-[28px_24px] overflow-y-auto bg-[#13161D]">
               <div className="text-[10px] font-mono text-[#4F7EFF] tracking-[0.15em] uppercase mb-5 pb-3.5 border-b border-[#1E2130]">
-                Informações gerais
+                InformaÃ§Ãµes gerais
               </div>
 
               <Field
-                label="Título da Reunião"
+                label="TÃ­tulo da ReuniÃ£o"
                 value={data.titulo}
                 onChange={(v) => updateField('titulo', v)}
-                placeholder="Ex: Alinhamento Q2 – Produto"
+                placeholder="Ex: Alinhamento Q2 â€“ Produto"
               />
 
               <div className="grid grid-cols-2 gap-2.5">
+                <div className="mb-4">
+                  <label className="block text-[10px] font-mono tracking-[0.12em] uppercase mb-1.5 text-[#6B7280]">
+                    Data
+                  </label>
+                  <DatePicker
+                    value={data.data}
+                    onChange={(v) => updateField('data', v)}
+                    placeholder="dd/mm/aaaa"
+                  />
+                </div>
                 <Field
-                  label="Data"
-                  value={data.data}
-                  onChange={(v) => {
-                    let val = v.replace(/\D/g, '');
-                    if (val.length > 8) val = val.substring(0, 8);
-                    if (val.length > 4)
-                      val = val.replace(/(\d{2})(\d{2})(\d{0,4})/, '$1/$2/$3');
-                    else if (val.length > 2)
-                      val = val.replace(/(\d{2})(\d{0,2})/, '$1/$2');
-                    updateField('data', val);
-                  }}
-                  placeholder="dd/mm/aaaa"
-                />
-                <Field
-                  label="Horário"
+                  label="HorÃ¡rio"
                   value={data.horario}
                   onChange={(v) => {
                     let val = v.replace(/\D/g, '');
@@ -455,13 +455,13 @@ export default function PautaReuniao({ onBack }: PautaReuniaoProps) {
               </div>
 
               <TextAreaField
-                label="Objetivo da Reunião"
+                label="Objetivo da ReuniÃ£o"
                 value={data.objetivo}
                 onChange={(v) => updateField('objetivo', v)}
                 placeholder="Listar objetivos (um por linha)..."
               />
               <TextAreaField
-                label="Observações"
+                label="ObservaÃ§Ãµes"
                 value={data.observacoes}
                 onChange={(v) => updateField('observacoes', v)}
                 placeholder="Notas adicionais, links ou avisos..."
@@ -487,7 +487,7 @@ export default function PautaReuniao({ onBack }: PautaReuniaoProps) {
                     Nenhum ponto de pauta
                   </div>
                   <div className="text-xs text-[#1E2130]">
-                    Clique em &quot;Adicionar item&quot; para começar
+                    Clique em &quot;Adicionar item&quot; para comeÃ§ar
                   </div>
                 </div>
               )}
@@ -522,3 +522,5 @@ export default function PautaReuniao({ onBack }: PautaReuniaoProps) {
     </>
   );
 }
+
+
