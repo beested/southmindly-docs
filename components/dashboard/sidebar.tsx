@@ -1,53 +1,7 @@
 'use client';
 
-import { DocMenuItem, DocType } from '@/types/docs';
-
-const DOC_MENU_ITEMS: DocMenuItem[] = [
-  {
-    id: 'pauta-reuniao',
-    label: 'Pauta de Reunião',
-    description: 'Estruture pontos, responsáveis e horários',
-    icon: '📋',
-    available: true,
-    color: '#4F7EFF',
-  },
-  {
-    id: 'ata-reuniao',
-    label: 'Ata de Reunião',
-    description: 'Registre decisões e encaminhamentos',
-    icon: '📝',
-    available: false,
-    badge: 'Em breve',
-    color: '#A78BFA',
-  },
-  {
-    id: 'proposta-comercial',
-    label: 'Proposta Comercial',
-    description: 'Crie propostas profissionais para clientes',
-    icon: '💼',
-    available: false,
-    badge: 'Em breve',
-    color: '#34D399',
-  },
-  {
-    id: 'clausula-contratual',
-    label: 'Cláusula Contratual',
-    description: 'Gere cláusulas padronizadas',
-    icon: '⚖️',
-    available: false,
-    badge: 'Em breve',
-    color: '#F59E0B',
-  },
-  {
-    id: 'contrato',
-    label: 'Contrato',
-    description: 'Monte contratos completos com variáveis',
-    icon: '📜',
-    available: false,
-    badge: 'Em breve',
-    color: '#F87171',
-  },
-];
+import { DOC_DEFINITIONS } from '@/lib/docs/registry';
+import { DocType } from '@/types/docs';
 
 interface SidebarProps {
   open: boolean;
@@ -55,6 +9,9 @@ interface SidebarProps {
   activeDoc: DocType | null;
   onSelectDoc: (doc: DocType) => void;
   onHome: () => void;
+  userEmail?: string | null;
+  onSignOut?: () => void;
+  onConsultSavedPautas?: () => void;
 }
 
 export default function Sidebar({
@@ -63,6 +20,9 @@ export default function Sidebar({
   activeDoc,
   onSelectDoc,
   onHome,
+  userEmail,
+  onSignOut,
+  onConsultSavedPautas,
 }: SidebarProps) {
   return (
     <aside
@@ -122,7 +82,38 @@ export default function Sidebar({
           open ? 'p-[4px_12px]' : 'p-[4px_8px]'
         }`}
       >
-        {DOC_MENU_ITEMS.map((item) => {
+        {onConsultSavedPautas && (
+          <button
+            onClick={onConsultSavedPautas}
+            title={!open ? 'Pautas salvas' : undefined}
+            className={`w-full flex ${
+              open ? 'items-start' : 'items-center'
+            } gap-2.5 ${
+              open ? 'p-3' : 'p-3'
+            } rounded-[10px] border mb-1 text-left flex-col transition-all duration-[180ms] ease-out hover:bg-[#1E2130] bg-transparent border-transparent cursor-pointer opacity-100`}
+          >
+            <div className="flex items-center gap-2.5 w-full">
+              <div className="w-8 h-8 rounded-lg flex items-center justify-center text-[15px] shrink-0 transition-all duration-200 bg-[#1E2130] border border-[#252A3A]">
+                📂
+              </div>
+              {open && (
+                <div className="flex-1 min-w-0">
+                  <div className="text-[13px] font-medium whitespace-nowrap overflow-hidden text-ellipsis flex items-center gap-1.5 font-sans">
+                    <span className="text-[#9CA3AF]">Pautas salvas</span>
+                  </div>
+                </div>
+              )}
+            </div>
+
+            {open && (
+              <div className="text-[11px] text-[#4B5563] pl-[42px] leading-[1.4] mt-0.5 whitespace-normal font-sans">
+                Consultar e abrir pautas cadastradas
+              </div>
+            )}
+          </button>
+        )}
+
+        {DOC_DEFINITIONS.map((item) => {
           const isActive = activeDoc === item.id;
           return (
             <button
@@ -189,6 +180,25 @@ export default function Sidebar({
       {/* Footer */}
       {open && (
         <div className="px-5 py-4 border-t border-[#1E2130] shrink-0">
+          {(userEmail || onSignOut) && (
+            <div className="mb-3">
+              {userEmail && (
+                <div className="text-[11px] text-[#6B7280] font-sans truncate">
+                  {userEmail}
+                </div>
+              )}
+
+              {onSignOut && (
+                <button
+                  onClick={onSignOut}
+                  className="mt-2 w-full h-9 rounded-lg border border-[#252A3A] bg-transparent text-[#F87171] text-[12px] font-medium hover:border-[#F8717133]"
+                >
+                  Sair
+                </button>
+              )}
+            </div>
+          )}
+
           <div className="text-[10px] text-[#374151] leading-[1.6] font-mono">
             <div className="text-[#4B5563]">v1.0.0 · SouthMindly Docs</div>
             <div>Sistema de Geração de Documentos</div>

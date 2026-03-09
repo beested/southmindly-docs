@@ -1,67 +1,64 @@
 'use client';
 
-import { DocMenuItem, DocType } from '@/types/docs';
+import { DOC_DEFINITIONS } from '@/lib/docs/registry';
+import { DocType } from '@/types/docs';
+import { useCallback, useEffect, useState } from 'react';
 
-const DOC_CARDS: DocMenuItem[] = [
-  {
-    id: 'pauta-reuniao',
-    label: 'Pauta de Reunião',
-    description:
-      'Estruture pontos, responsáveis e horários da sua reunião com clareza.',
-    icon: '📋',
-    available: true,
-    color: '#4F7EFF',
-  },
-  {
-    id: 'ata-reuniao',
-    label: 'Ata de Reunião',
-    description: 'Registre decisões, encaminhamentos e ações pós-reunião.',
-    icon: '📝',
-    available: false,
-    badge: 'Em breve',
-    color: '#A78BFA',
-  },
-  {
-    id: 'proposta-comercial',
-    label: 'Proposta Comercial',
-    description:
-      'Crie propostas profissionais personalizadas para cada cliente.',
-    icon: '💼',
-    available: false,
-    badge: 'Em breve',
-    color: '#34D399',
-  },
-  {
-    id: 'clausula-contratual',
-    label: 'Cláusula Contratual',
-    description: 'Gere cláusulas padronizadas e revisadas para seus contratos.',
-    icon: '⚖️',
-    available: false,
-    badge: 'Em breve',
-    color: '#F59E0B',
-  },
-  {
-    id: 'contrato',
-    label: 'Contrato',
-    description:
-      'Monte contratos completos com variáveis dinâmicas e templates.',
-    icon: '📜',
-    available: false,
-    badge: 'Em breve',
-    color: '#F87171',
-  },
-];
+type PautaListItem = {
+  id: string;
+  docId: string;
+  titulo: string;
+  updatedAt: string;
+  createdAt: string;
+};
 
 interface DocHomeProps {
   onSelectDoc: (doc: DocType) => void;
+  onOpenSavedPauta: (id: string) => void;
 }
 
-export default function DocHome({ onSelectDoc }: DocHomeProps) {
+export default function DocHome({ onSelectDoc, onOpenSavedPauta }: DocHomeProps) {
   const stats = [
     { label: 'Documentos gerados', value: '0', icon: '📄' },
     { label: 'Templates ativos', value: '1', icon: '✅' },
     { label: 'Em breve', value: '4', icon: '🚀' },
   ];
+
+  const [pautas, setPautas] = useState<PautaListItem[]>([]);
+  const [loadingPautas, setLoadingPautas] = useState(false);
+  const [pautasError, setPautasError] = useState<string | null>(null);
+
+  const refreshPautas = useCallback(async () => {
+    setLoadingPautas(true);
+    setPautasError(null);
+    try {
+      const res = await fetch('/api/pautas', { cache: 'no-store' });
+      const json = (await res.json().catch(() => ({}))) as {
+        items?: PautaListItem[];
+        error?: string;
+      };
+      if (!res.ok) {
+        setPautasError(json.error ?? 'Erro ao carregar pautas');
+        setPautas([]);
+        return;
+      }
+      setPautas(Array.isArray(json.items) ? json.items : []);
+    } finally {
+      setLoadingPautas(false);
+    }
+  }, []);
+
+  useEffect(() => {
+    refreshPautas();
+  }, [refreshPautas]);
+
+  const deletePauta = async (id: string) => {
+    if (!window.confirm('Excluir esta pauta?')) return;
+    const res = await fetch(`/api/pautas/${id}`, { method: 'DELETE' });
+    if (res.ok) {
+      refreshPautas();
+    }
+  };
 
   return (
     <div className="p-[40px_48px] max-w-[960px] w-full text-[#E8EAF0] font-sans">
@@ -114,7 +111,7 @@ export default function DocHome({ onSelectDoc }: DocHomeProps) {
 
       {/* Cards Grid */}
       <div className="grid grid-cols-[repeat(auto-fill,minmax(260px,1fr))] gap-4">
-        {DOC_CARDS.map((card) => (
+        {DOC_DEFINITIONS.map((card) => (
           <div
             key={card.id}
             className={`group ${
@@ -200,6 +197,75 @@ export default function DocHome({ onSelectDoc }: DocHomeProps) {
             </div>
           </div>
         ))}
+      </div>
+
+      {/* Divider */}
+      <div className="text-[11px] text-[#4B5563] tracking-[0.15em] uppercase mt-12 mb-5 flex items-center gap-3 font-mono">
+        Meus documentos
+        <div className="flex-1 h-px bg-[#1E2130]" />
+      </div>
+
+      <div className="bg-[#13161D] border border-[#1E2130] rounded-2xl overflow-hidden">
+        <div className="px-6 py-4 border-b border-[#1E2130] flex items-center justify-between">
+          <div>
+            <div className="text-xs font-mono text-[#6B7280] tracking-[0.14em] uppercase">
+              Pautas de reunião
+            </div>
+            <div className="text-sm font-medium text-[#E8EAF0]">
+              {loadingPautas ? 'Carregando...' : `${pautas.length} item(ns)`}
+            </div>
+          </div>
+          <div className="flex items-center gap-2">
+            <button
+              onClick={refreshPautas}
+              className="h-9 px-3 rounded-lg border border-[#252A3A] bg-transparent text-[#9CA3AF] text-[12px] font-medium hover:border-[#4F7EFF44] hover:text-[#4F7EFF]"
+              title="Atualizar lista"
+            >
+              ↻ Atualizar
+            </button>
+            <button
+              onClick={() => onSelectDoc('pauta-reuniao')}
+              className="h-9 px-4 rounded-lg bg-[#4F7EFF] text-white text-[12px] font-medium"
+              title="Criar nova pauta"
+            >
+              + Nova pauta
+            </button>
+          </div>
+        </div>
+
+        {pautasError && (
+          <div className="px-6 py-4 text-sm text-[#F87171] bg-[#F8717110] border-b border-[#1E2130]">
+            {pautasError}
+          </div>
+        )}
+
+        <div className="max-h-[50vh] overflow-auto divide-y divide-[#1E2130]">
+          {!loadingPautas && pautas.length === 0 && !pautasError && (
+            <div className="p-6 text-sm text-[#6B7280]">
+              Nenhuma pauta salva ainda.
+            </div>
+          )}
+
+          {pautas.map((p) => (
+            <div key={p.id} className="p-5 flex items-center gap-3">
+              <button onClick={() => onOpenSavedPauta(p.id)} className="flex-1 text-left">
+                <div className="text-sm font-medium text-[#E8EAF0] truncate">
+                  {p.titulo || 'Sem título'}
+                </div>
+                <div className="text-[11px] text-[#6B7280] font-mono mt-1">
+                  {p.docId} · atualizado {new Date(p.updatedAt).toLocaleString('pt-BR')}
+                </div>
+              </button>
+              <button
+                onClick={() => deletePauta(p.id)}
+                className="h-9 px-3 rounded-lg border border-[#252A3A] bg-transparent text-[#F87171] text-[12px] font-medium hover:border-[#F8717133]"
+                title="Excluir"
+              >
+                Excluir
+              </button>
+            </div>
+          ))}
+        </div>
       </div>
     </div>
   );

@@ -4,11 +4,25 @@ import DocHome from '@/components/dashboard/docHome';
 import Sidebar from '@/components/dashboard/sidebar';
 import PautaReuniao from '@/components/docs/pauta-reuniao';
 import { DocType } from '@/types/docs';
-import { useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
+import { useRouter } from 'next/navigation';
+import { createSupabaseBrowserClient } from '@/lib/supabase/browser';
 
 export default function DashboardPage() {
+  const router = useRouter();
+  const supabase = useMemo(() => createSupabaseBrowserClient(), []);
+
   const [activeDoc, setActiveDoc] = useState<DocType | null>(null);
   const [sidebarOpen, setSidebarOpen] = useState(true);
+  const [userEmail, setUserEmail] = useState<string | null>(null);
+  const [openSavedPautasToken, setOpenSavedPautasToken] = useState(0);
+  const [openSavedPautaId, setOpenSavedPautaId] = useState<string | null>(null);
+
+  useEffect(() => {
+    supabase.auth
+      .getUser()
+      .then(({ data }) => setUserEmail(data.user?.email ?? null));
+  }, [supabase]);
 
   const handleSelectDoc = (doc: DocType) => {
     setActiveDoc(doc);
@@ -18,12 +32,40 @@ export default function DashboardPage() {
     setActiveDoc(null);
   };
 
+  const handleSignOut = async () => {
+    await supabase.auth.signOut();
+    router.push('/login');
+    router.refresh();
+  };
+
+  const handleConsultSavedPautas = () => {
+    setActiveDoc('pauta-reuniao');
+    setOpenSavedPautaId(null);
+    setOpenSavedPautasToken((t) => t + 1);
+  };
+
+  const handleOpenSavedPauta = (id: string) => {
+    setActiveDoc('pauta-reuniao');
+    setOpenSavedPautaId(id);
+  };
+
   const renderContent = () => {
     switch (activeDoc) {
       case 'pauta-reuniao':
-        return <PautaReuniao onBack={handleBack} />;
+        return (
+          <PautaReuniao
+            onBack={handleBack}
+            openSavedPautasToken={openSavedPautasToken}
+            openSavedPautaId={openSavedPautaId ?? undefined}
+          />
+        );
       default:
-        return <DocHome onSelectDoc={handleSelectDoc} />;
+        return (
+          <DocHome
+            onSelectDoc={handleSelectDoc}
+            onOpenSavedPauta={handleOpenSavedPauta}
+          />
+        );
     }
   };
 
@@ -35,6 +77,9 @@ export default function DashboardPage() {
         activeDoc={activeDoc}
         onSelectDoc={handleSelectDoc}
         onHome={handleBack}
+        userEmail={userEmail}
+        onSignOut={handleSignOut}
+        onConsultSavedPautas={handleConsultSavedPautas}
       />
       <main
         style={{

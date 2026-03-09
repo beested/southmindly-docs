@@ -1,11 +1,13 @@
 ﻿'use client';
 
 import { AgendaItem, PautaData } from '@/types/docs';
-import { useCallback, useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import { DatePicker } from '@/components/ui/date-picker';
 
 interface PautaReuniaoProps {
   onBack: () => void;
+  openSavedPautasToken?: number;
+  openSavedPautaId?: string;
 }
 
 const generateId = (): string => Math.random().toString(36).substring(2, 9);
@@ -180,9 +182,12 @@ function Preview({ data, docId }: PreviewProps) {
       {/* Header */}
       <div className="flex justify-between items-start mb-6 pb-4 border-b-2 border-purple-800">
         <h1 className="font-sans text-4xl font-bold text-black m-0 leading-tight">
-          Pauta de ReuniÃ£o
+          Pauta de Reunião
         </h1>
         <img src="/logo-icon.png" alt="SouthMindly" className="h-12 w-auto" />
+      </div>
+      <div className="text-[10px] font-mono text-gray-500 mb-6">
+        Documento: {docId}
       </div>
 
       {/* Info Header */}
@@ -194,14 +199,14 @@ function Preview({ data, docId }: PreviewProps) {
         <div className="text-right flex flex-col items-end">
           <div className="flex gap-1">
             <span className="font-bold">Data:</span>
-            <span>{data.data || 'â€”'}</span>
+            <span>{data.data || '—'}</span>
           </div>
           <div className="flex gap-1">
-            <span className="font-bold">Horario:</span>
-            <span>{data.horario || 'â€”'}</span>
+            <span className="font-bold">Horário:</span>
+            <span>{data.horario || '—'}</span>
           </div>
           <div className="italic mt-1">
-            {data.local || 'Google Meet - GravaÃ§Ã£o da reuniÃ£o'}
+            {data.local || 'Google Meet - Gravação da reunião'}
           </div>
         </div>
       </div>
@@ -289,10 +294,27 @@ const EMPTY_DATA: PautaData = {
   itens: [],
 };
 
-export default function PautaReuniao({ onBack }: PautaReuniaoProps) {
+type PautaListItem = {
+  id: string;
+  docId: string;
+  titulo: string;
+  updatedAt: string;
+  createdAt: string;
+};
+
+export default function PautaReuniao({
+  onBack,
+  openSavedPautasToken,
+  openSavedPautaId,
+}: PautaReuniaoProps) {
   const [activeTab, setActiveTab] = useState<'editor' | 'preview'>('editor');
   const [data, setData] = useState<PautaData>(EMPTY_DATA);
-  const [docId] = useState<string>(generateDocId);
+  const [docId, setDocId] = useState<string>(generateDocId);
+  const [pautaDbId, setPautaDbId] = useState<string | null>(null);
+  const [pautas, setPautas] = useState<PautaListItem[]>([]);
+  const [listOpen, setListOpen] = useState(false);
+  const [saving, setSaving] = useState(false);
+  const [statusMsg, setStatusMsg] = useState<string | null>(null);
 
   const updateField = useCallback(
     <K extends keyof PautaData>(field: K, value: PautaData[K]) => {
@@ -328,6 +350,98 @@ export default function PautaReuniao({ onBack }: PautaReuniaoProps) {
 
   const handlePrint = () => window.print();
 
+  const refreshList = useCallback(async () => {
+    const res = await fetch('/api/pautas', { cache: 'no-store' });
+    const json = (await res.json().catch(() => ({}))) as {
+      items?: PautaListItem[];
+      error?: string;
+    };
+
+    if (!res.ok) {
+      setStatusMsg(json.error ?? 'Erro ao carregar pautas');
+      return;
+    }
+
+    setPautas(Array.isArray(json.items) ? json.items : []);
+  }, []);
+
+  useEffect(() => {
+    if (!openSavedPautasToken) return;
+    setListOpen(true);
+    refreshList();
+  }, [openSavedPautasToken, refreshList]);
+
+  useEffect(() => {
+    if (!openSavedPautaId) return;
+    handleOpenSaved(openSavedPautaId);
+  }, [openSavedPautaId]);
+
+  const handleNew = () => {
+    setPautaDbId(null);
+    setDocId(generateDocId());
+    setData({ ...EMPTY_DATA, itens: [] });
+    setStatusMsg(null);
+    setActiveTab('editor');
+  };
+
+  const handleSave = async () => {
+    setSaving(true);
+    setStatusMsg(null);
+    try {
+      const res = await fetch(
+        pautaDbId ? `/api/pautas/${pautaDbId}` : '/api/pautas',
+        {
+          method: pautaDbId ? 'PUT' : 'POST',
+          headers: { 'content-type': 'application/json' },
+          body: JSON.stringify({ docId, pauta: data }),
+        },
+      );
+
+      const json = (await res.json().catch(() => ({}))) as
+        | { id: string }
+        | { error?: string };
+
+      if (!res.ok) {
+        setStatusMsg((json as { error?: string }).error ?? 'Erro ao salvar');
+        return;
+      }
+
+      setPautaDbId((json as { id: string }).id);
+      setStatusMsg('Salvo no Supabase');
+      await refreshList();
+    } finally {
+      setSaving(false);
+    }
+  };
+
+  const handleOpenSaved = async (id: string) => {
+    const res = await fetch(`/api/pautas/${id}`, { cache: 'no-store' });
+    if (!res.ok) return;
+    const json = (await res.json()) as {
+      id: string;
+      docId: string;
+      pauta: PautaData;
+    };
+
+    setPautaDbId(json.id);
+    setDocId(json.docId);
+    setData(json.pauta);
+    setListOpen(false);
+    setActiveTab('editor');
+    setStatusMsg(null);
+  };
+
+  const handleDeleteSaved = async (id: string) => {
+    if (!window.confirm('Excluir esta pauta?')) return;
+    const res = await fetch(`/api/pautas/${id}`, { method: 'DELETE' });
+    if (res.ok) {
+      if (pautaDbId === id) {
+        handleNew();
+      }
+      await refreshList();
+    }
+  };
+
   return (
     <>
       <style>{`
@@ -362,7 +476,7 @@ export default function PautaReuniao({ onBack }: PautaReuniaoProps) {
             <div className="w-px h-5 bg-[#1E2130]" />
             <div>
               <div className="text-[10px] font-mono text-[#6B7280] tracking-[0.1em] uppercase">
-                Pauta de ReuniÃ£o
+                Pauta de Reunião
               </div>
               <div className="text-[13px] font-sans text-[#E8EAF0] font-medium">
                 {data.titulo || 'Novo documento'}
@@ -371,6 +485,23 @@ export default function PautaReuniao({ onBack }: PautaReuniaoProps) {
           </div>
 
           <div className="flex gap-2 items-center">
+            <button
+              onClick={handleNew}
+              className="px-4.5 py-1.5 rounded-lg border border-[#252A3A] cursor-pointer text-[13px] font-sans font-medium bg-transparent text-[#9CA3AF] transition-all duration-200 hover:border-[#A78BFA55] hover:text-[#A78BFA]"
+              title="Novo documento"
+            >
+              ＋ Novo
+            </button>
+            <button
+              onClick={() => {
+                setListOpen(true);
+                refreshList();
+              }}
+              className="px-4.5 py-1.5 rounded-lg border border-[#252A3A] cursor-pointer text-[13px] font-sans font-medium bg-transparent text-[#9CA3AF] transition-all duration-200 hover:border-[#4F7EFF44] hover:text-[#4F7EFF]"
+              title="Consultar pautas salvas"
+            >
+              📂 Pautas
+            </button>
             <button
               onClick={() => setActiveTab('editor')}
               className={`px-4 py-1.5 rounded-lg border-none cursor-pointer text-[13px] font-sans font-medium transition-all duration-200 ${activeTab === 'editor' ? 'bg-[#4F7EFF] text-white' : 'bg-transparent text-[#6B7280]'}`}
@@ -385,6 +516,14 @@ export default function PautaReuniao({ onBack }: PautaReuniaoProps) {
             </button>
             <div className="w-px h-5 bg-[#1E2130] mx-1" />
             <button
+              onClick={handleSave}
+              disabled={saving}
+              className="px-4.5 py-1.5 rounded-lg border border-[#4F7EFF44] cursor-pointer text-[13px] font-sans font-medium bg-[#4F7EFF18] text-[#4F7EFF] transition-all duration-200 hover:bg-[#4F7EFF33] disabled:opacity-60"
+              title="Salvar no Supabase"
+            >
+              💾 {pautaDbId ? 'Atualizar' : 'Salvar'}
+            </button>
+            <button
               onClick={handlePrint}
               className="px-4.5 py-1.5 rounded-lg border border-[#252A3A] cursor-pointer text-[13px] font-sans font-medium bg-transparent text-[#9CA3AF] transition-all duration-200 hover:border-[#4F7EFF] hover:text-[#4F7EFF]"
             >
@@ -392,6 +531,82 @@ export default function PautaReuniao({ onBack }: PautaReuniaoProps) {
             </button>
           </div>
         </header>
+
+        {statusMsg && (
+          <div className="px-8 py-3 border-b border-[#1E2130] text-[12px] text-[#9CA3AF] bg-[#13161D] print:hidden">
+            {statusMsg}
+          </div>
+        )}
+
+        {listOpen && (
+          <div className="fixed inset-0 z-[500] bg-black/60 flex items-center justify-center p-6 print:hidden">
+            <div className="w-full max-w-2xl bg-[#13161D] border border-[#1E2130] rounded-2xl shadow-[0_24px_64px_rgba(0,0,0,0.45)] overflow-hidden">
+              <div className="px-6 py-4 border-b border-[#1E2130] flex items-center justify-between">
+                <div>
+                  <div className="text-xs font-mono text-[#6B7280] tracking-[0.14em] uppercase">
+                    Minhas pautas
+                  </div>
+                  <div className="text-sm font-medium text-[#E8EAF0]">
+                    Selecione para abrir ou excluir
+                  </div>
+                </div>
+                <button
+                  onClick={() => setListOpen(false)}
+                  className="text-[#6B7280] hover:text-[#E8EAF0] px-2 py-1 rounded"
+                >
+                  ✕
+                </button>
+              </div>
+
+              <div className="max-h-[60vh] overflow-auto divide-y divide-[#1E2130]">
+                {pautas.length === 0 && (
+                  <div className="p-6 text-sm text-[#6B7280]">
+                    Nenhuma pauta salva ainda.
+                  </div>
+                )}
+
+                {pautas.map((p) => (
+                  <div key={p.id} className="p-5 flex items-center gap-3">
+                    <button
+                      onClick={() => handleOpenSaved(p.id)}
+                      className="flex-1 text-left"
+                    >
+                      <div className="text-sm font-medium text-[#E8EAF0] truncate">
+                        {p.titulo || 'Sem título'}
+                      </div>
+                      <div className="text-[11px] text-[#6B7280] font-mono mt-1">
+                        {p.docId} · atualizado{' '}
+                        {new Date(p.updatedAt).toLocaleString('pt-BR')}
+                      </div>
+                    </button>
+                    <button
+                      onClick={() => handleDeleteSaved(p.id)}
+                      className="h-9 px-3 rounded-lg border border-[#252A3A] bg-transparent text-[#F87171] text-[12px] font-medium hover:border-[#F8717133]"
+                      title="Excluir"
+                    >
+                      Excluir
+                    </button>
+                  </div>
+                ))}
+              </div>
+
+              <div className="px-6 py-4 border-t border-[#1E2130] flex items-center justify-between">
+                <div className="text-[11px] text-[#6B7280] font-mono">
+                  {pautas.length} {pautas.length === 1 ? 'item' : 'itens'}
+                </div>
+                <button
+                  onClick={() => {
+                    handleNew();
+                    setListOpen(false);
+                  }}
+                  className="h-9 px-4 rounded-lg bg-[#4F7EFF] text-white text-[12px] font-medium"
+                >
+                  Novo
+                </button>
+              </div>
+            </div>
+          </div>
+        )}
 
         {/* Content */}
         <div className="flex-1 overflow-auto">
@@ -522,5 +737,3 @@ export default function PautaReuniao({ onBack }: PautaReuniaoProps) {
     </>
   );
 }
-
-
