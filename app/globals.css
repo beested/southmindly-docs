@@ -125,3 +125,32 @@
     @apply bg-background text-foreground;
   }
 }
+
+@layer utilities {
+  .sm-textarea-scrollbar {
+    scrollbar-width: thin;
+    scrollbar-color: #252a3a transparent;
+  }
+
+  .sm-textarea-scrollbar::-webkit-scrollbar {
+    width: 10px;
+    height: 10px;
+  }
+
+  .sm-textarea-scrollbar::-webkit-scrollbar-track {
+    background: transparent;
+  }
+
+  .sm-textarea-scrollbar::-webkit-scrollbar-thumb {
+    background: #252a3a;
+    border-radius: 9999px;
+    border: 2px solid transparent;
+    background-clip: content-box;
+  }
+
+  .sm-textarea-scrollbar::-webkit-scrollbar-thumb:hover {
+    background: #4f7eff;
+    border: 2px solid transparent;
+    background-clip: content-box;
+  }
+}

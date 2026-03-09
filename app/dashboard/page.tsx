@@ -2,7 +2,9 @@
 
 import DocHome from '@/components/dashboard/docHome';
 import Sidebar from '@/components/dashboard/sidebar';
+import Clientes from '@/components/docs/clientes';
 import PautaReuniao from '@/components/docs/pauta-reuniao';
+import PropostaComercial from '@/components/docs/proposta-comercial';
 import { DocType } from '@/types/docs';
 import { useEffect, useMemo, useState } from 'react';
 import { useRouter } from 'next/navigation';
@@ -59,6 +61,10 @@ export default function DashboardPage() {
             openSavedPautaId={openSavedPautaId ?? undefined}
           />
         );
+      case 'proposta-comercial':
+        return <PropostaComercial onBack={handleBack} />;
+      case 'clientes':
+        return <Clientes onBack={handleBack} />;
       default:
         return (
           <DocHome

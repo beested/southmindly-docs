@@ -1,8 +1,20 @@
 ﻿'use client';
 
-import { AgendaItem, PautaData } from '@/types/docs';
-import { useCallback, useEffect, useState } from 'react';
+import { Button } from '@/components/ui/button';
 import { DatePicker } from '@/components/ui/date-picker';
+import { AgendaItem, PautaData } from '@/types/docs';
+import {
+  ClipboardList,
+  Download,
+  Eye,
+  FilePlus2,
+  FolderOpen,
+  Pencil,
+  Plus,
+  Save,
+  Trash2,
+} from 'lucide-react';
+import { useCallback, useEffect, useState } from 'react';
 
 interface PautaReuniaoProps {
   onBack: () => void;
@@ -21,7 +33,7 @@ const generateDocId = (): string => {
   return `SM-${y}${m}${d}-${rand}`;
 };
 
-// â”€â”€ Sub-components â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+// ── Sub-components ──────────────────────────────────────────────────────────
 
 interface FieldProps {
   label: string;
@@ -82,15 +94,15 @@ function TextAreaField({
       >
         {label}
       </label>
-      <textarea
-        value={value}
-        onChange={(e) => onChange(e.target.value)}
-        placeholder={placeholder}
-        rows={rows}
-        onFocus={() => setFocused(true)}
-        onBlur={() => setFocused(false)}
-        className={`w-full bg-[#191C25] border rounded-lg px-3.5 py-2.5 text-[#E8EAF0] text-sm font-sans outline-none resize-y transition-colors duration-200 placeholder:text-[#6B7280] placeholder:opacity-55 ${focused ? 'border-[#4F7EFF]' : 'border-[#1E2130]'}`}
-      />
+	      <textarea
+	        value={value}
+	        onChange={(e) => onChange(e.target.value)}
+	        placeholder={placeholder}
+	        rows={rows}
+	        onFocus={() => setFocused(true)}
+	        onBlur={() => setFocused(false)}
+	        className={`sm-textarea-scrollbar w-full bg-[#191C25] border rounded-lg px-3.5 py-2.5 text-[#E8EAF0] text-sm font-sans outline-none resize-y transition-colors duration-200 placeholder:text-[#6B7280] placeholder:opacity-55 ${focused ? 'border-[#4F7EFF]' : 'border-[#1E2130]'}`}
+	      />
     </div>
   );
 }
@@ -127,46 +139,48 @@ function AgendaItemRow({
         <input
           value={item.titulo}
           onChange={(e) => onChange({ ...item, titulo: e.target.value })}
-          placeholder="TÃ­tulo do ponto de pauta..."
+          placeholder="Título do ponto de pauta..."
           className="bg-transparent border-none outline-none text-[#E8EAF0] text-sm font-sans font-medium w-full placeholder:text-[#6B7280] placeholder:opacity-55"
         />
         <div className="flex gap-2.5">
           <input
             value={item.responsavel}
             onChange={(e) => onChange({ ...item, responsavel: e.target.value })}
-            placeholder="ResponsÃ¡vel"
+            placeholder="Responsável"
             className="bg-[#0D0F1488] border border-[#1E2130] rounded-md px-2.5 py-1.5 text-[#9CA3AF] text-xs font-mono outline-none flex-1 placeholder:text-[#6B7280] placeholder:opacity-55"
           />
           <input
             value={item.duracao}
             onChange={(e) => onChange({ ...item, duracao: e.target.value })}
-            placeholder="DuraÃ§Ã£o"
+            placeholder="Duração"
             className="bg-[#0D0F1488] border border-[#1E2130] rounded-md px-2.5 py-1.5 text-[#9CA3AF] text-xs font-mono outline-none w-[150px] placeholder:text-[#6B7280] placeholder:opacity-55"
           />
         </div>
 
-        <textarea
-          value={topicsText}
-          onChange={(e) => updateTopics(e.target.value)}
-          placeholder="TÃ³picos (um por linha)..."
-          rows={3}
-          className="bg-[#0D0F1488] border border-[#1E2130] rounded-md px-2.5 py-1.5 text-[#9CA3AF] text-xs font-sans outline-none w-full resize-y placeholder:text-[#6B7280] placeholder:opacity-55"
-        />
+	        <textarea
+	          value={topicsText}
+	          onChange={(e) => updateTopics(e.target.value)}
+	          placeholder="Tópicos (um por linha)..."
+	          rows={3}
+	          className="sm-textarea-scrollbar bg-[#0D0F1488] border border-[#1E2130] rounded-md px-2.5 py-1.5 text-[#9CA3AF] text-xs font-sans outline-none w-full resize-y placeholder:text-[#6B7280] placeholder:opacity-55"
+	        />
       </div>
 
-      <button
+      <Button
+        type="button"
+        variant="ghost"
         onClick={onRemove}
         onMouseEnter={() => setHoverRemove(true)}
         onMouseLeave={() => setHoverRemove(false)}
-        className={`bg-transparent border-none cursor-pointer p-1 rounded text-sm leading-none shrink-0 transition-colors duration-200 ${hoverRemove ? 'text-[#F87171]' : 'text-[#6B7280]'}`}
+        className={`h-auto w-auto bg-transparent hover:bg-transparent border-none cursor-pointer p-1 rounded text-sm leading-none shrink-0 transition-colors duration-200 ${hoverRemove ? 'text-[#F87171]' : 'text-[#6B7280]'}`}
       >
-        ✕
-      </button>
+        <Trash2 className="size-4" />
+      </Button>
     </div>
   );
 }
 
-// â”€â”€ Preview (light document) â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+// ── Preview (light document) ────────────────────────────────────────────────
 
 interface PreviewProps {
   data: PautaData;
@@ -215,7 +229,7 @@ function Preview({ data, docId }: PreviewProps) {
       {data.objetivo && (
         <div className="mb-8">
           <h2 className="text-xl font-bold mb-3 text-black">
-            Objetivos dessa reuniÃ£o:
+            Objetivos dessa reunião:
           </h2>
           <ul className="list-disc pl-5 space-y-1">
             {data.objetivo
@@ -258,7 +272,7 @@ function Preview({ data, docId }: PreviewProps) {
                 </ul>
               ) : (
                 <p className="text-sm text-gray-500 italic pl-5">
-                  Sem tÃ³picos detalhados.
+                  Sem tópicos detalhados.
                 </p>
               )}
             </div>
@@ -467,12 +481,14 @@ export default function PautaReuniao({
         {/* Topbar */}
         <header className="border-b border-[#1E2130] px-8 flex items-center justify-between h-[60px] bg-[#0D0F14EE] backdrop-blur-md shrink-0 print:hidden">
           <div className="flex items-center gap-4">
-            <button
+            <Button
+              type="button"
+              variant="ghost"
               onClick={onBack}
-              className="bg-transparent border-none text-[#6B7280] cursor-pointer text-lg p-1 px-2 flex items-center transition-colors duration-200 hover:text-[#E8EAF0]"
+              className="h-auto bg-transparent hover:bg-transparent border-none text-[#6B7280] cursor-pointer text-lg p-1 px-2 flex items-center transition-colors duration-200 hover:text-[#E8EAF0]"
             >
               ←
-            </button>
+            </Button>
             <div className="w-px h-5 bg-[#1E2130]" />
             <div>
               <div className="text-[10px] font-mono text-[#6B7280] tracking-[0.1em] uppercase">
@@ -485,50 +501,68 @@ export default function PautaReuniao({
           </div>
 
           <div className="flex gap-2 items-center">
-            <button
+            <Button
+              type="button"
+              variant="ghost"
               onClick={handleNew}
-              className="px-4.5 py-1.5 rounded-lg border border-[#252A3A] cursor-pointer text-[13px] font-sans font-medium bg-transparent text-[#9CA3AF] transition-all duration-200 hover:border-[#A78BFA55] hover:text-[#A78BFA]"
+              className="h-auto px-4.5 py-1.5 rounded-lg border border-[#252A3A] cursor-pointer text-[13px] font-sans font-medium bg-transparent text-[#9CA3AF] transition-all duration-200 hover:border-[#A78BFA55] hover:text-[#A78BFA] hover:bg-transparent"
               title="Novo documento"
             >
-              ＋ Novo
-            </button>
-            <button
+              <FilePlus2 className="size-4" />
+              Novo
+            </Button>
+            <Button
+              type="button"
+              variant="ghost"
               onClick={() => {
                 setListOpen(true);
                 refreshList();
               }}
-              className="px-4.5 py-1.5 rounded-lg border border-[#252A3A] cursor-pointer text-[13px] font-sans font-medium bg-transparent text-[#9CA3AF] transition-all duration-200 hover:border-[#4F7EFF44] hover:text-[#4F7EFF]"
+              className="h-auto px-4.5 py-1.5 rounded-lg border border-[#252A3A] cursor-pointer text-[13px] font-sans font-medium bg-transparent text-[#9CA3AF] transition-all duration-200 hover:border-[#4F7EFF44] hover:text-[#4F7EFF] hover:bg-transparent"
               title="Consultar pautas salvas"
             >
-              📂 Pautas
-            </button>
-            <button
+              <FolderOpen className="size-4" />
+              Pautas
+            </Button>
+            <Button
+              type="button"
+              variant="ghost"
               onClick={() => setActiveTab('editor')}
-              className={`px-4 py-1.5 rounded-lg border-none cursor-pointer text-[13px] font-sans font-medium transition-all duration-200 ${activeTab === 'editor' ? 'bg-[#4F7EFF] text-white' : 'bg-transparent text-[#6B7280]'}`}
+              className={`h-auto px-4 py-1.5 rounded-lg border-none cursor-pointer text-[13px] font-sans font-medium transition-all duration-200 hover:bg-transparent ${activeTab === 'editor' ? 'bg-[#4F7EFF] text-white hover:bg-[#4F7EFF] hover:text-white' : 'bg-transparent text-[#6B7280]'}`}
             >
-              ✏️ Editor
-            </button>
-            <button
+              <Pencil className="size-4" />
+              Editor
+            </Button>
+            <Button
+              type="button"
+              variant="ghost"
               onClick={() => setActiveTab('preview')}
-              className={`px-4 py-1.5 rounded-lg border-none cursor-pointer text-[13px] font-sans font-medium transition-all duration-200 ${activeTab === 'preview' ? 'bg-[#4F7EFF] text-white' : 'bg-transparent text-[#6B7280]'}`}
+              className={`h-auto px-4 py-1.5 rounded-lg border-none cursor-pointer text-[13px] font-sans font-medium transition-all duration-200 hover:bg-transparent ${activeTab === 'preview' ? 'bg-[#4F7EFF] text-white hover:bg-[#4F7EFF] hover:text-white' : 'bg-transparent text-[#6B7280]'}`}
             >
-              👁 Preview
-            </button>
+              <Eye className="size-4" />
+              Preview
+            </Button>
             <div className="w-px h-5 bg-[#1E2130] mx-1" />
-            <button
+            <Button
+              type="button"
+              variant="ghost"
               onClick={handleSave}
               disabled={saving}
-              className="px-4.5 py-1.5 rounded-lg border border-[#4F7EFF44] cursor-pointer text-[13px] font-sans font-medium bg-[#4F7EFF18] text-[#4F7EFF] transition-all duration-200 hover:bg-[#4F7EFF33] disabled:opacity-60"
+              className="h-auto px-4.5 py-1.5 rounded-lg border border-[#4F7EFF44] cursor-pointer text-[13px] font-sans font-medium bg-[#4F7EFF18] text-[#4F7EFF] transition-all duration-200 hover:bg-[#4F7EFF33] hover:text-[#4F7EFF] disabled:opacity-60"
               title="Salvar no Supabase"
             >
-              💾 {pautaDbId ? 'Atualizar' : 'Salvar'}
-            </button>
-            <button
+              <Save className="size-4" />
+              {pautaDbId ? 'Atualizar' : 'Salvar'}
+            </Button>
+            <Button
+              type="button"
+              variant="ghost"
               onClick={handlePrint}
-              className="px-4.5 py-1.5 rounded-lg border border-[#252A3A] cursor-pointer text-[13px] font-sans font-medium bg-transparent text-[#9CA3AF] transition-all duration-200 hover:border-[#4F7EFF] hover:text-[#4F7EFF]"
+              className="h-auto px-4.5 py-1.5 rounded-lg border border-[#252A3A] cursor-pointer text-[13px] font-sans font-medium bg-transparent text-[#9CA3AF] transition-all duration-200 hover:border-[#4F7EFF] hover:text-[#4F7EFF] hover:bg-transparent"
             >
-              ⬇ PDF
-            </button>
+              <Download className="size-4" />
+              PDF
+            </Button>
           </div>
         </header>
 
@@ -550,12 +584,14 @@ export default function PautaReuniao({
                     Selecione para abrir ou excluir
                   </div>
                 </div>
-                <button
+                <Button
+                  type="button"
+                  variant="ghost"
                   onClick={() => setListOpen(false)}
-                  className="text-[#6B7280] hover:text-[#E8EAF0] px-2 py-1 rounded"
+                  className="h-auto w-auto text-[#6B7280] hover:text-[#E8EAF0] px-2 py-1 rounded hover:bg-transparent"
                 >
                   ✕
-                </button>
+                </Button>
               </div>
 
               <div className="max-h-[60vh] overflow-auto divide-y divide-[#1E2130]">
@@ -567,9 +603,11 @@ export default function PautaReuniao({
 
                 {pautas.map((p) => (
                   <div key={p.id} className="p-5 flex items-center gap-3">
-                    <button
+                    <Button
+                      type="button"
+                      variant="ghost"
                       onClick={() => handleOpenSaved(p.id)}
-                      className="flex-1 text-left"
+                      className="h-auto flex-1 text-left justify-start px-0 py-0 hover:bg-transparent"
                     >
                       <div className="text-sm font-medium text-[#E8EAF0] truncate">
                         {p.titulo || 'Sem título'}
@@ -578,14 +616,18 @@ export default function PautaReuniao({
                         {p.docId} · atualizado{' '}
                         {new Date(p.updatedAt).toLocaleString('pt-BR')}
                       </div>
-                    </button>
-                    <button
-                      onClick={() => handleDeleteSaved(p.id)}
-                      className="h-9 px-3 rounded-lg border border-[#252A3A] bg-transparent text-[#F87171] text-[12px] font-medium hover:border-[#F8717133]"
-                      title="Excluir"
-                    >
-                      Excluir
-                    </button>
+                    </Button>
+	                    <Button
+	                      type="button"
+	                      variant="destructive"
+	                      size="xs"
+	                      onClick={() => handleDeleteSaved(p.id)}
+	                      title="Excluir"
+	                      className="mt-0 w-auto"
+	                    >
+	                      <Trash2 className="size-3.5" />
+	                      Excluir
+	                    </Button>
                   </div>
                 ))}
               </div>
@@ -594,15 +636,17 @@ export default function PautaReuniao({
                 <div className="text-[11px] text-[#6B7280] font-mono">
                   {pautas.length} {pautas.length === 1 ? 'item' : 'itens'}
                 </div>
-                <button
+                <Button
+                  type="button"
+                  variant="ghost"
                   onClick={() => {
                     handleNew();
                     setListOpen(false);
                   }}
-                  className="h-9 px-4 rounded-lg bg-[#4F7EFF] text-white text-[12px] font-medium"
+                  className="h-9 px-4 rounded-lg bg-[#4F7EFF] text-white text-[12px] font-medium hover:bg-[#4F7EFF] hover:text-white"
                 >
                   Novo
-                </button>
+                </Button>
               </div>
             </div>
           </div>
@@ -616,14 +660,14 @@ export default function PautaReuniao({
             {/* Left panel: form */}
             <div className="border-r border-[#1E2130] p-[28px_24px] overflow-y-auto bg-[#13161D]">
               <div className="text-[10px] font-mono text-[#4F7EFF] tracking-[0.15em] uppercase mb-5 pb-3.5 border-b border-[#1E2130]">
-                InformaÃ§Ãµes gerais
+                Informações gerais
               </div>
 
               <Field
-                label="TÃ­tulo da ReuniÃ£o"
+                label="Título da Reunião"
                 value={data.titulo}
                 onChange={(v) => updateField('titulo', v)}
-                placeholder="Ex: Alinhamento Q2 â€“ Produto"
+                placeholder="Ex: Alinhamento Q2 – Produto"
               />
 
               <div className="grid grid-cols-2 gap-2.5">
@@ -638,7 +682,7 @@ export default function PautaReuniao({
                   />
                 </div>
                 <Field
-                  label="HorÃ¡rio"
+                  label="Horário"
                   value={data.horario}
                   onChange={(v) => {
                     let val = v.replace(/\D/g, '');
@@ -670,13 +714,13 @@ export default function PautaReuniao({
               </div>
 
               <TextAreaField
-                label="Objetivo da ReuniÃ£o"
+                label="Objetivo da Reunião"
                 value={data.objetivo}
                 onChange={(v) => updateField('objetivo', v)}
                 placeholder="Listar objetivos (um por linha)..."
               />
               <TextAreaField
-                label="ObservaÃ§Ãµes"
+                label="Observações"
                 value={data.observacoes}
                 onChange={(v) => updateField('observacoes', v)}
                 placeholder="Notas adicionais, links ou avisos..."
@@ -697,12 +741,14 @@ export default function PautaReuniao({
 
               {data.itens.length === 0 && (
                 <div className="text-center p-[56px_24px] text-[#6B7280] text-sm border border-dashed border-[#1E2130] rounded-xl mb-4">
-                  <div className="text-4xl mb-3 opacity-35">📋</div>
+                  <div className="text-4xl mb-3 opacity-35">
+                    <ClipboardList className="mx-auto size-10" />
+                  </div>
                   <div className="mb-1.5 font-medium">
                     Nenhum ponto de pauta
                   </div>
                   <div className="text-xs text-[#1E2130]">
-                    Clique em &quot;Adicionar item&quot; para comeÃ§ar
+                    Clique em &quot;Adicionar item&quot; para começar
                   </div>
                 </div>
               )}
@@ -717,12 +763,15 @@ export default function PautaReuniao({
                 />
               ))}
 
-              <button
+              <Button
+                type="button"
+                variant="ghost"
                 onClick={addItem}
-                className="w-full p-3.5 bg-[#4F7EFF18] border border-dashed border-[#4F7EFF44] rounded-xl text-[#4F7EFF] text-[13px] font-sans font-medium cursor-pointer transition-colors duration-200 mt-1 hover:bg-[#4F7EFF33]"
+                className="h-auto w-full p-3.5 bg-[#4F7EFF18] border border-dashed border-[#4F7EFF44] rounded-xl text-[#4F7EFF] text-[13px] font-sans font-medium cursor-pointer transition-colors duration-200 mt-1 hover:bg-[#4F7EFF33] hover:text-[#4F7EFF]"
               >
-                + Adicionar item
-              </button>
+                <Plus className="size-4" />
+                Adicionar item
+              </Button>
             </div>
           </div>
 

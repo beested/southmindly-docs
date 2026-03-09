@@ -1,8 +1,9 @@
 'use client';
 
-import { useMemo, useState } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
+import { useMemo, useState } from 'react';
 
+import { Button } from '@/components/ui/button';
 import { createSupabaseBrowserClient } from '@/lib/supabase/browser';
 
 type Mode = 'signin' | 'signup';
@@ -97,35 +98,37 @@ export default function LoginClient() {
             </div>
           )}
 
-          <button
+          <Button
+            type="submit"
+            variant="ghost"
             disabled={submitting}
-            className="w-full h-11 rounded-xl bg-[#4F7EFF] text-white font-medium text-sm transition-opacity disabled:opacity-60"
+            className="w-full h-11 rounded-xl bg-[#4F7EFF] text-white font-medium text-sm transition-opacity disabled:opacity-60 hover:bg-[#4F7EFF] hover:text-white"
           >
             {submitting
               ? 'Aguarde...'
               : mode === 'signin'
                 ? 'Entrar'
                 : 'Criar conta'}
-          </button>
+          </Button>
         </form>
 
         <div className="mt-5 flex items-center justify-between text-xs text-[#6B7280]">
           <div className="font-mono tracking-[0.12em] uppercase">
             {mode === 'signin' ? 'Não tem conta?' : 'Já tem conta?'}
           </div>
-          <button
+          <Button
             type="button"
+            variant="ghost"
             onClick={() => {
               setError(null);
               setMode((m) => (m === 'signin' ? 'signup' : 'signin'));
             }}
-            className="text-[#A78BFA] hover:text-[#C4B5FD]"
+            className="text-[#A78BFA] hover:text-[#C4B5FD] hover:bg-transparent"
           >
             {mode === 'signin' ? 'Criar conta' : 'Entrar'}
-          </button>
+          </Button>
         </div>
       </div>
     </div>
   );
 }
-
