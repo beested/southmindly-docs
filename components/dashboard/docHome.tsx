@@ -9,6 +9,7 @@ import {
   FileBadge2,
   FileText,
   FolderKanban,
+  type LucideIcon,
   Plus,
   RefreshCw,
   Trash2,
@@ -178,7 +179,7 @@ function StatCard({
   label: string;
   value: string;
   helper: string;
-  icon: React.ComponentType<{ className?: string }>;
+  icon: LucideIcon;
   accent: string;
 }) {
   return (
@@ -247,8 +248,7 @@ export default function DocHome({
 
       if (!pautasRes.ok) {
         throw new Error(
-          (pautasJson as { error?: string }).error ??
-            'Erro ao carregar pautas',
+          (pautasJson as { error?: string }).error ?? 'Erro ao carregar pautas',
         );
       }
 
@@ -324,7 +324,8 @@ export default function DocHome({
     return lastMonths.map((monthKey) => {
       const propostasCount = propostas.filter((proposta) => {
         const sourceDate =
-          parseAnyDate(proposta.dataProposta) ?? parseAnyDate(proposta.updatedAt);
+          parseAnyDate(proposta.dataProposta) ??
+          parseAnyDate(proposta.updatedAt);
         return sourceDate ? getMonthKey(sourceDate) === monthKey : false;
       }).length;
 
@@ -533,37 +534,40 @@ export default function DocHome({
           >
             <div className="-mx-1 overflow-x-auto px-1">
               <div className="flex min-w-[560px] items-end gap-3 sm:min-w-0">
-              {monthlyActivity.map((item) => (
-                <div key={item.monthKey} className="flex flex-1 flex-col items-center">
-                  <div className="mb-3 flex h-[210px] w-full items-end justify-center gap-2 rounded-[20px] border border-[#1E2130] bg-[#0D0F1488] px-2 pb-3 pt-6">
-                    <div className="flex w-full max-w-[34px] flex-col items-center gap-2">
-                      <div className="text-[10px] font-mono text-[#6B7280]">
-                        {item.propostas}
+                {monthlyActivity.map((item) => (
+                  <div
+                    key={item.monthKey}
+                    className="flex flex-1 flex-col items-center"
+                  >
+                    <div className="mb-3 flex h-[210px] w-full items-end justify-center gap-2 rounded-[20px] border border-[#1E2130] bg-[#0D0F1488] px-2 pb-3 pt-6">
+                      <div className="flex w-full max-w-[34px] flex-col items-center gap-2">
+                        <div className="text-[10px] font-mono text-[#6B7280]">
+                          {item.propostas}
+                        </div>
+                        <div
+                          className="w-full rounded-t-[10px] bg-[#4F7EFF]"
+                          style={{
+                            height: `${(item.propostas / maxMonthlyValue) * 150 + 12}px`,
+                          }}
+                        />
                       </div>
-                      <div
-                        className="w-full rounded-t-[10px] bg-[#4F7EFF]"
-                        style={{
-                          height: `${(item.propostas / maxMonthlyValue) * 150 + 12}px`,
-                        }}
-                      />
+                      <div className="flex w-full max-w-[34px] flex-col items-center gap-2">
+                        <div className="text-[10px] font-mono text-[#6B7280]">
+                          {item.pautas}
+                        </div>
+                        <div
+                          className="w-full rounded-t-[10px] bg-[#34D399]"
+                          style={{
+                            height: `${(item.pautas / maxMonthlyValue) * 150 + 12}px`,
+                          }}
+                        />
+                      </div>
                     </div>
-                    <div className="flex w-full max-w-[34px] flex-col items-center gap-2">
-                      <div className="text-[10px] font-mono text-[#6B7280]">
-                        {item.pautas}
-                      </div>
-                      <div
-                        className="w-full rounded-t-[10px] bg-[#34D399]"
-                        style={{
-                          height: `${(item.pautas / maxMonthlyValue) * 150 + 12}px`,
-                        }}
-                      />
+                    <div className="text-[11px] font-mono uppercase tracking-[0.12em] text-[#8B93A7]">
+                      {item.label}
                     </div>
                   </div>
-                  <div className="text-[11px] font-mono uppercase tracking-[0.12em] text-[#8B93A7]">
-                    {item.label}
-                  </div>
-                </div>
-              ))}
+                ))}
               </div>
             </div>
 
@@ -579,7 +583,10 @@ export default function DocHome({
             </div>
           </ChartCard>
 
-          <ChartCard eyebrow="Pipeline" title="Distribuição de propostas por status">
+          <ChartCard
+            eyebrow="Pipeline"
+            title="Distribuição de propostas por status"
+          >
             <div className="space-y-4">
               {statusStats.map((item) => (
                 <div key={item.key}>
@@ -591,7 +598,9 @@ export default function DocHome({
                       />
                       <span className="text-[#E8EAF0]">{item.label}</span>
                     </div>
-                    <span className="font-mono text-[#9CA3AF]">{item.value}</span>
+                    <span className="font-mono text-[#9CA3AF]">
+                      {item.value}
+                    </span>
                   </div>
                   <div className="h-2.5 overflow-hidden rounded-full bg-[#191C25]">
                     <div
@@ -616,7 +625,9 @@ export default function DocHome({
                   <div key={item.label}>
                     <div className="mb-1.5 flex items-center justify-between gap-3 text-sm">
                       <span className="text-[#E8EAF0]">{item.label}</span>
-                      <span className="font-mono text-[#9CA3AF]">{item.value}</span>
+                      <span className="font-mono text-[#9CA3AF]">
+                        {item.value}
+                      </span>
                     </div>
                     <div className="h-2.5 overflow-hidden rounded-full bg-[#191C25]">
                       <div
@@ -643,17 +654,22 @@ export default function DocHome({
                   <div key={item.label}>
                     <div className="mb-1.5 flex items-center justify-between gap-3 text-sm">
                       <span className="text-[#E8EAF0]">{item.label}</span>
-                      <span className="font-mono text-[#9CA3AF]">{item.value}</span>
+                      <span className="font-mono text-[#9CA3AF]">
+                        {item.value}
+                      </span>
                     </div>
                     <div className="h-2.5 overflow-hidden rounded-full bg-[#191C25]">
                       <div
                         className="h-full rounded-full"
                         style={{
                           width: `${(item.value / maxEscopoTypeValue) * 100}%`,
-                          backgroundColor:
-                            ['#6B19DB', '#4F7EFF', '#34D399', '#F59E0B', '#F87171'][
-                              index % 5
-                            ],
+                          backgroundColor: [
+                            '#6B19DB',
+                            '#4F7EFF',
+                            '#34D399',
+                            '#F59E0B',
+                            '#F87171',
+                          ][index % 5],
                         }}
                       />
                     </div>
@@ -693,8 +709,9 @@ export default function DocHome({
                       </div>
                     </div>
                     <div className="text-right text-[11px] font-mono text-[#6B7280]">
-                      {parseAnyDate(item.updatedAt)?.toLocaleDateString('pt-BR') ??
-                        '—'}
+                      {parseAnyDate(item.updatedAt)?.toLocaleDateString(
+                        'pt-BR',
+                      ) ?? '—'}
                     </div>
                   </div>
                 ))
@@ -718,7 +735,9 @@ export default function DocHome({
               <div
                 key={card.id}
                 className={`group ${
-                  card.available ? 'cursor-pointer' : 'cursor-default opacity-55'
+                  card.available
+                    ? 'cursor-pointer'
+                    : 'cursor-default opacity-55'
                 }`}
                 style={
                   {
@@ -747,8 +766,12 @@ export default function DocHome({
                     <div
                       className="flex h-11 w-11 items-center justify-center rounded-2xl border"
                       style={{
-                        background: card.available ? `${card.color}18` : '#1E2130',
-                        borderColor: card.available ? `${card.color}33` : '#252A3A',
+                        background: card.available
+                          ? `${card.color}18`
+                          : '#1E2130',
+                        borderColor: card.available
+                          ? `${card.color}33`
+                          : '#252A3A',
                       }}
                     >
                       <card.icon
@@ -787,7 +810,9 @@ export default function DocHome({
                     className="text-xs font-medium font-mono"
                     style={{ color: card.available ? card.color : '#4B5563' }}
                   >
-                    {card.available ? 'Criar documento →' : 'Em desenvolvimento'}
+                    {card.available
+                      ? 'Criar documento →'
+                      : 'Em desenvolvimento'}
                   </div>
                 </div>
               </div>
@@ -838,7 +863,9 @@ export default function DocHome({
                       <div
                         className="flex h-11 w-11 items-center justify-center rounded-2xl border"
                         style={{
-                          background: card.available ? `${card.color}18` : '#1E2130',
+                          background: card.available
+                            ? `${card.color}18`
+                            : '#1E2130',
                           borderColor: card.available
                             ? `${card.color}33`
                             : '#252A3A',
@@ -902,7 +929,9 @@ export default function DocHome({
                   Pautas de reunião
                 </div>
                 <div className="text-sm font-medium text-[#E8EAF0]">
-                  {loadingDashboard ? 'Carregando...' : `${pautas.length} item(ns)`}
+                  {loadingDashboard
+                    ? 'Carregando...'
+                    : `${pautas.length} item(ns)`}
                 </div>
               </div>
               <div className="flex items-center gap-2">
