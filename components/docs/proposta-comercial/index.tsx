@@ -31,6 +31,13 @@ export default function PropostaComercial({ onBack }: PropostaComercialProps) {
   const [propostaDbId, setPropostaDbId] = useState<string | null>(null);
   const [saving, setSaving] = useState(false);
   const [statusMsg, setStatusMsg] = useState<string | null>(null);
+  const [creatingNewFromList, setCreatingNewFromList] = useState(false);
+  const [openingPropostaId, setOpeningPropostaId] = useState<string | null>(
+    null,
+  );
+  const [deletingPropostaId, setDeletingPropostaId] = useState<string | null>(
+    null,
+  );
   const [activeTab, setActiveTab] = useState<'editor' | 'preview'>('editor');
   const [clientes, setClientes] = useState<ClienteItem[]>([]);
   const [assessores, setAssessores] = useState<AssessorItem[]>([]);
@@ -169,27 +176,44 @@ export default function PropostaComercial({ onBack }: PropostaComercialProps) {
     setActiveTab('editor');
   }, []);
 
-  const handleOpenSaved = useCallback(async (id: string) => {
-    setListOpen(false);
-    setStatusMsg('Carregando proposta...');
-
-    const res = await fetch(`/api/propostas/${id}`, { cache: 'no-store' });
-    if (!res.ok) {
-      setStatusMsg('Erro ao carregar proposta');
-      return;
-    }
-
-    const json = (await res.json().catch(() => null)) as PropostaResponse;
-    if (!json) {
-      setStatusMsg('Erro ao carregar proposta');
-      return;
-    }
+  const handleCreateNewFromList = useCallback(async () => {
+    setCreatingNewFromList(true);
+    setStatusMsg('Preparando nova proposta...');
 
     try {
+      await new Promise<void>((resolve) => {
+        requestAnimationFrame(() => resolve());
+      });
+
+      handleNew();
+      setListOpen(false);
+    } finally {
+      setCreatingNewFromList(false);
+    }
+  }, [handleNew]);
+
+  const handleOpenSaved = useCallback(async (id: string) => {
+    try {
+      setOpeningPropostaId(id);
+      setStatusMsg('Carregando proposta...');
+
+      const res = await fetch(`/api/propostas/${id}`, { cache: 'no-store' });
+      if (!res.ok) {
+        setStatusMsg('Erro ao carregar proposta');
+        return;
+      }
+
+      const json = (await res.json().catch(() => null)) as PropostaResponse;
+      if (!json) {
+        setStatusMsg('Erro ao carregar proposta');
+        return;
+      }
+
       const proposta = normalizeLoadedProposta(json.proposta);
 
       setPropostaDbId(json.id);
       setData(proposta);
+      setListOpen(false);
       setStatusMsg(null);
       setActiveTab('editor');
     } catch (error) {
@@ -200,21 +224,33 @@ export default function PropostaComercial({ onBack }: PropostaComercialProps) {
 
       setStatusMsg('Erro ao carregar proposta');
       return;
+    } finally {
+      setOpeningPropostaId(null);
     }
   }, []);
 
   const handleDeleteSaved = useCallback(
     async (id: string) => {
-      if (!window.confirm('Excluir esta proposta?')) return;
+      setDeletingPropostaId(id);
+      setStatusMsg('Excluindo proposta...');
 
-      const res = await fetch(`/api/propostas/${id}`, { method: 'DELETE' });
-      if (!res.ok) return;
+      try {
+        const res = await fetch(`/api/propostas/${id}`, { method: 'DELETE' });
+        if (!res.ok) {
+          setStatusMsg('Erro ao excluir proposta');
+          return;
+        }
 
-      if (propostaDbId === id) {
-        handleNew();
+        if (propostaDbId === id) {
+          handleNew();
+        }
+
+        await refreshList();
+        setStatusMsg('Proposta excluída');
+        setTimeout(() => setStatusMsg(null), 2400);
+      } finally {
+        setDeletingPropostaId(null);
       }
-
-      await refreshList();
     },
     [handleNew, propostaDbId, refreshList],
   );
@@ -288,7 +324,7 @@ export default function PropostaComercial({ onBack }: PropostaComercialProps) {
         />
 
         {statusMsg && (
-          <div className="px-8 py-3 border-b border-[#1E2130] text-[12px] text-[#9CA3AF] bg-[#13161D] print:hidden">
+          <div className="border-b border-[#1E2130] bg-[#13161D] px-4 py-3 text-[12px] text-[#9CA3AF] print:hidden sm:px-6 lg:px-8">
             {statusMsg}
           </div>
         )}
@@ -296,11 +332,11 @@ export default function PropostaComercial({ onBack }: PropostaComercialProps) {
         <PropostasModal
           open={listOpen}
           propostas={propostas}
+          creatingNew={creatingNewFromList}
+          openingId={openingPropostaId}
+          deletingId={deletingPropostaId}
           onClose={() => setListOpen(false)}
-          onNew={() => {
-            handleNew();
-            setListOpen(false);
-          }}
+          onNew={handleCreateNewFromList}
           onOpenSaved={handleOpenSaved}
           onDeleteSaved={handleDeleteSaved}
         />
@@ -317,7 +353,7 @@ export default function PropostaComercial({ onBack }: PropostaComercialProps) {
 
         <div className="flex-1 overflow-auto">
           <div
-            className={`grid grid-cols-[360px_1fr] min-h-[calc(100vh-60px)] ${activeTab === 'preview' ? 'hidden' : ''} print:hidden`}
+            className={`min-h-[calc(100vh-60px)] ${activeTab === 'preview' ? 'hidden' : 'grid'} grid-cols-1 print:hidden lg:grid-cols-[360px_1fr]`}
           >
             <GeneralInfoPanel
               data={data}
@@ -336,7 +372,7 @@ export default function PropostaComercial({ onBack }: PropostaComercialProps) {
           </div>
 
           <div
-            className={`${activeTab === 'preview' ? 'block' : 'hidden'} print:block p-[40px_32px] bg-[#0D0F14] min-h-full print:p-0 print:bg-white`}
+            className={`${activeTab === 'preview' ? 'block' : 'hidden'} min-h-full bg-[#0D0F14] px-3 py-6 print:block print:bg-white print:p-0 sm:px-4 lg:p-[40px_32px]`}
           >
             <PropostaPreview proposta={data} cliente={selectedCliente} />
           </div>

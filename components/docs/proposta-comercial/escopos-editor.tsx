@@ -29,7 +29,7 @@ export function EscoposEditor({
   const sortedEscopos = escopos.slice().sort((a, b) => a.ordem - b.ordem);
 
   return (
-    <div className="p-[28px_32px] overflow-y-auto">
+    <div className="overflow-y-auto p-4 sm:p-5 lg:p-[28px_32px]">
       <div className="flex justify-between items-center mb-5 pb-3.5 border-b border-[#1E2130]">
         <div className="text-[10px] font-mono text-[#34D399] tracking-[0.15em] uppercase">
           Escopos

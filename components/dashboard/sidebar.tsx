@@ -3,33 +3,37 @@
 import { Button } from '@/components/ui/button';
 import { DOC_DEFINITIONS, PEOPLE_DEFINITIONS } from '@/lib/docs/registry';
 import { DocType } from '@/types/docs';
-import { FolderOpen, LogOut } from 'lucide-react';
+import { LogOut } from 'lucide-react';
 
 interface SidebarProps {
   open: boolean;
+  isMobile?: boolean;
   onToggle: () => void;
   activeDoc: DocType | null;
   onSelectDoc: (doc: DocType) => void;
   onHome: () => void;
   userEmail?: string | null;
   onSignOut?: () => void;
-  onConsultSavedPautas?: () => void;
 }
 
 export default function Sidebar({
   open,
+  isMobile = false,
   onToggle,
   activeDoc,
   onSelectDoc,
   onHome,
   userEmail,
   onSignOut,
-  onConsultSavedPautas,
 }: SidebarProps) {
   return (
     <aside
-      className={`fixed top-0 left-0 h-screen bg-[#13161D] border-r border-[#1E2130] z-[200] flex flex-col overflow-hidden transition-[width] duration-300 ease-out ${
-        open ? 'w-[260px]' : 'w-[64px]'
+      className={`fixed top-0 left-0 z-[200] flex h-screen flex-col overflow-hidden border-r border-[#1E2130] bg-[#13161D] transition-all duration-300 ease-out ${
+        isMobile
+          ? `w-[280px] max-w-[86vw] ${open ? 'translate-x-0' : '-translate-x-full'} shadow-[0_24px_80px_rgba(0,0,0,0.45)]`
+          : open
+            ? 'w-[260px]'
+            : 'w-[64px]'
       }`}
     >
       {/* Header */}
@@ -45,7 +49,7 @@ export default function Sidebar({
           </Button>
         )}
 
-        {!open && (
+        {!open && !isMobile && (
           <div
             className="flex items-center justify-center cursor-pointer mx-auto"
             onClick={onHome}
@@ -61,12 +65,12 @@ export default function Sidebar({
             onClick={onToggle}
             className="h-auto w-auto bg-transparent border-none text-[#6B7280] cursor-pointer p-1.5 rounded-md text-base flex items-center justify-center hover:bg-[#1E2130]"
           >
-            ‹
+            {isMobile ? '✕' : '‹'}
           </Button>
         )}
       </div>
 
-      {!open && (
+      {!open && !isMobile && (
         <Button
           type="button"
           variant="ghost"
@@ -90,39 +94,6 @@ export default function Sidebar({
           open ? 'p-[4px_12px]' : 'p-[4px_8px]'
         }`}
       >
-        {onConsultSavedPautas && (
-          <Button
-            type="button"
-            variant="ghost"
-            onClick={onConsultSavedPautas}
-            title={!open ? 'Pautas salvas' : undefined}
-            className={`w-full flex ${
-              open ? 'items-start' : 'items-center'
-            } gap-2.5 ${
-              open ? 'p-3' : 'p-3'
-            } h-auto rounded-[10px] border mb-1 text-left flex-col justify-start transition-all duration-[180ms] ease-out hover:bg-[#1E2130] bg-transparent border-transparent cursor-pointer opacity-100`}
-          >
-	            <div className="flex items-center gap-2.5 w-full">
-	              <div className="w-8 h-8 rounded-lg flex items-center justify-center text-[15px] shrink-0 transition-all duration-200 bg-[#1E2130] border border-[#252A3A]">
-	                <FolderOpen className="size-4 text-[#9CA3AF]" />
-	              </div>
-              {open && (
-                <div className="flex-1 min-w-0">
-                  <div className="text-[13px] font-medium whitespace-nowrap overflow-hidden text-ellipsis flex items-center gap-1.5 font-sans">
-                    <span className="text-[#9CA3AF]">Pautas salvas</span>
-                  </div>
-                </div>
-              )}
-            </div>
-
-            {open && (
-              <div className="text-[11px] text-[#4B5563] pl-[42px] leading-[1.4] mt-0.5 whitespace-normal font-sans">
-                Consultar e abrir pautas cadastradas
-              </div>
-            )}
-          </Button>
-        )}
-
         {DOC_DEFINITIONS.map((item) => {
           const isActive = activeDoc === item.id;
           const Icon = item.icon;
@@ -133,17 +104,25 @@ export default function Sidebar({
               key={item.id}
               onClick={() => item.available && onSelectDoc(item.id)}
               title={!open ? item.label : undefined}
-              className={`w-full flex ${
-                open ? 'items-start' : 'items-center'
-              } gap-2.5 ${
-                open ? 'p-3' : 'p-3'
-              } h-auto rounded-[10px] border mb-0.5 text-left flex-col justify-start transition-all duration-[180ms] ease-out hover:bg-[#1E2130] ${
+              className={`mb-0.5 flex w-full rounded-[10px] border transition-all duration-[180ms] ease-out hover:bg-[#1E2130] ${
                 isActive
                   ? 'bg-[#1a2340] border-[#4F7EFF44]'
                   : 'bg-transparent border-transparent'
-              } ${item.available ? 'cursor-pointer opacity-100' : 'cursor-default opacity-50'}`}
+              } ${
+                item.available
+                  ? 'cursor-pointer opacity-100'
+                  : 'cursor-default opacity-50'
+              } ${
+                open
+                  ? 'h-auto flex-col items-start justify-start gap-2.5 p-3 text-left'
+                  : 'h-[52px] items-center justify-center p-0 text-center'
+              }`}
             >
-              <div className="flex items-center gap-2.5 w-full">
+              <div
+                className={`flex items-center gap-2.5 ${
+                  open ? 'w-full justify-start' : 'w-full justify-center'
+                }`}
+              >
                 <div
                   className={`w-8 h-8 rounded-lg flex items-center justify-center text-[15px] shrink-0 transition-all duration-200 ${
                     isActive ? '' : 'bg-[#1E2130] border border-[#252A3A]'
@@ -214,17 +193,25 @@ export default function Sidebar({
                   key={item.id}
                   onClick={() => item.available && onSelectDoc(item.id)}
                   title={!open ? item.label : undefined}
-                  className={`w-full flex ${
-                    open ? 'items-start' : 'items-center'
-                  } gap-2.5 ${
-                    open ? 'p-3' : 'p-3'
-                  } h-auto rounded-[10px] border mb-0.5 text-left flex-col justify-start transition-all duration-[180ms] ease-out hover:bg-[#1E2130] ${
+                  className={`mb-0.5 flex w-full rounded-[10px] border transition-all duration-[180ms] ease-out hover:bg-[#1E2130] ${
                     isActive
                       ? 'bg-[#1a2340] border-[#4F7EFF44]'
                       : 'bg-transparent border-transparent'
-                  } ${item.available ? 'cursor-pointer opacity-100' : 'cursor-default opacity-50'}`}
+                  } ${
+                    item.available
+                      ? 'cursor-pointer opacity-100'
+                      : 'cursor-default opacity-50'
+                  } ${
+                    open
+                      ? 'h-auto flex-col items-start justify-start gap-2.5 p-3 text-left'
+                      : 'h-[52px] items-center justify-center p-0 text-center'
+                  }`}
                 >
-                  <div className="flex items-center gap-2.5 w-full">
+                  <div
+                    className={`flex items-center gap-2.5 ${
+                      open ? 'w-full justify-start' : 'w-full justify-center'
+                    }`}
+                  >
                     <div
                       className={`w-8 h-8 rounded-lg flex items-center justify-center text-[15px] shrink-0 transition-all duration-200 ${
                         isActive ? '' : 'bg-[#1E2130] border border-[#252A3A]'
@@ -287,17 +274,17 @@ export default function Sidebar({
                 </div>
               )}
 
-	              {onSignOut && (
-	                <Button
-	                  type="button"
-	                  variant="destructive"
-	                  onClick={onSignOut}
-	                  className="w-full"
-	                >
-	                  <LogOut className="size-4" />
-	                  Sair
-	                </Button>
-	              )}
+              {onSignOut && (
+                <Button
+                  type="button"
+                  variant="destructive"
+                  onClick={onSignOut}
+                  className="w-full"
+                >
+                  <LogOut className="size-4" />
+                  Sair
+                </Button>
+              )}
             </div>
           )}
 

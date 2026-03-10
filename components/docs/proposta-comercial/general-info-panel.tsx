@@ -3,7 +3,12 @@
 import { DatePicker } from '@/components/ui/date-picker';
 import { PropostaComercialData } from '@/types/docs';
 
-import { Field, SelectField, TextAreaField } from './form-fields';
+import {
+  Field,
+  MultiSelectField,
+  SelectField,
+  TextAreaField,
+} from './form-fields';
 import { AssessorItem, ClienteItem, SelectOption } from './types';
 
 interface GeneralInfoPanelProps {
@@ -21,13 +26,18 @@ export function GeneralInfoPanel({
   assessores,
   statusOptions,
 }: GeneralInfoPanelProps) {
+  const selectedAssessorIds = data.assessorId
+    .split(',')
+    .map((value) => value.trim())
+    .filter(Boolean);
+
   return (
-    <div className="border-r border-[#1E2130] p-[28px_24px] overflow-y-auto bg-[#13161D]">
+    <div className="overflow-y-auto border-b border-[#1E2130] bg-[#13161D] p-4 sm:p-5 lg:border-b-0 lg:border-r lg:p-[28px_24px]">
       <div className="text-[10px] font-mono text-[#34D399] tracking-[0.15em] uppercase mb-5 pb-3.5 border-b border-[#1E2130]">
         Informações gerais
       </div>
 
-      <div className="grid grid-cols-2 gap-2.5">
+      <div className="grid grid-cols-1 gap-2.5 sm:grid-cols-2">
         <Field
           label="Número"
           value={data.numeroProposta}
@@ -68,18 +78,20 @@ export function GeneralInfoPanel({
         placeholder="Selecione o cliente"
       />
 
-      <SelectField
-        label="Assessor"
-        value={data.assessorId}
-        onChange={(assessorId) => onChange({ assessorId })}
+      <MultiSelectField
+        label="Assessores"
+        values={selectedAssessorIds}
+        onChange={(assessorIds) =>
+          onChange({ assessorId: assessorIds.join(', ') })
+        }
         options={assessores.map((assessor) => ({
           value: assessor.id,
           label: assessor.nome || assessor.id,
         }))}
-        placeholder="Selecione o assessor"
+        placeholder="Selecione um ou mais assessores"
       />
 
-      <div className="grid grid-cols-2 gap-2.5">
+      <div className="grid grid-cols-1 gap-2.5 sm:grid-cols-2">
         <div className="mb-4">
           <label className="block text-[10px] font-mono tracking-[0.12em] uppercase mb-1.5 text-[#6B7280]">
             Data da proposta
@@ -99,7 +111,7 @@ export function GeneralInfoPanel({
         />
       </div>
 
-      <div className="grid grid-cols-2 gap-2.5">
+      <div className="grid grid-cols-1 gap-2.5 sm:grid-cols-2">
         <div className="mb-4">
           <label className="block text-[10px] font-mono tracking-[0.12em] uppercase mb-1.5 text-[#6B7280]">
             Data do aceite

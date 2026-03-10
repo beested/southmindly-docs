@@ -315,8 +315,9 @@ export default function Clientes({ onBack }: ClientesProps) {
 
   return (
     <div className="min-h-screen bg-[#0D0F14] font-sans text-[#E8EAF0] flex flex-col">
-      <header className="border-b border-[#1E2130] px-8 flex items-center justify-between h-[60px] bg-[#0D0F14EE] backdrop-blur-md shrink-0">
-        <div className="flex items-center gap-4">
+      <header className="border-b border-[#1E2130] bg-[#0D0F14EE] px-4 py-3 backdrop-blur-md sm:px-6 lg:px-8">
+        <div className="flex flex-col gap-3 lg:flex-row lg:items-center lg:justify-between">
+        <div className="flex min-w-0 items-center gap-4">
           <Button
             type="button"
             variant="ghost"
@@ -336,7 +337,7 @@ export default function Clientes({ onBack }: ClientesProps) {
           </div>
         </div>
 
-        <div className="flex gap-2 items-center">
+        <div className="flex flex-wrap items-center gap-2">
           <Button
             type="button"
             variant="ghost"
@@ -359,17 +360,18 @@ export default function Clientes({ onBack }: ClientesProps) {
             {editingId ? 'Atualizar' : 'Salvar'}
           </Button>
         </div>
+        </div>
       </header>
 
       {statusMsg && (
-        <div className="px-8 py-3 border-b border-[#1E2130] text-[12px] text-[#9CA3AF] bg-[#13161D]">
+        <div className="px-4 py-3 border-b border-[#1E2130] text-[12px] text-[#9CA3AF] bg-[#13161D] sm:px-6 lg:px-8">
           {statusMsg}
         </div>
       )}
 
       <div className="flex-1 overflow-auto">
-        <div className="grid grid-cols-[360px_1fr] min-h-[calc(100vh-60px)]">
-          <div className="border-r border-[#1E2130] p-[28px_24px] overflow-y-auto bg-[#13161D]">
+        <div className="grid min-h-[calc(100vh-60px)] grid-cols-1 lg:grid-cols-[360px_1fr]">
+          <div className="border-b border-[#1E2130] bg-[#13161D] p-4 overflow-y-auto sm:p-5 lg:border-b-0 lg:border-r lg:p-[28px_24px]">
             <div className="text-[10px] font-mono text-[#06B6D4] tracking-[0.15em] uppercase mb-5 pb-3.5 border-b border-[#1E2130]">
               Dados do cliente
             </div>
@@ -382,7 +384,7 @@ export default function Clientes({ onBack }: ClientesProps) {
               icon={<Building2 className="size-4" />}
             />
 
-            <div className="grid grid-cols-2 gap-2.5">
+            <div className="grid grid-cols-1 gap-2.5 sm:grid-cols-2">
               <Field
                 label="Cidade"
                 value={form.cidade}
@@ -496,8 +498,8 @@ export default function Clientes({ onBack }: ClientesProps) {
             </div>
           </div>
 
-          <div className="p-[28px_32px] overflow-y-auto">
-            <div className="flex items-center justify-between mb-5 pb-3.5 border-b border-[#1E2130]">
+          <div className="overflow-y-auto p-4 sm:p-5 lg:p-[28px_32px]">
+            <div className="mb-5 flex flex-col gap-4 border-b border-[#1E2130] pb-3.5 xl:flex-row xl:items-center xl:justify-between">
               <div>
                 <div className="text-[10px] font-mono text-[#06B6D4] tracking-[0.15em] uppercase">
                   Lista
@@ -507,14 +509,14 @@ export default function Clientes({ onBack }: ClientesProps) {
                 </div>
               </div>
 
-              <div className="flex items-center gap-2">
-                <div className="relative">
+              <div className="flex flex-col gap-2 sm:flex-row sm:items-center">
+                <div className="relative flex-1">
                   <Search className="absolute left-3 top-1/2 -translate-y-1/2 size-4 text-[#6B7280]" />
                   <input
                     value={query}
                     onChange={(e) => setQuery(e.target.value)}
                     placeholder="Buscar..."
-                    className="w-[240px] h-[48px] bg-[#191C25] border border-[#1E2130] rounded-lg pl-10 pr-3.5 text-[#E8EAF0] text-sm font-sans outline-none transition-all duration-200 placeholder:text-[#6B7280] placeholder:opacity-55 hover:border-[#252A3A] focus-visible:border-[#06B6D4] focus-visible:ring-[3px] focus-visible:ring-[#06B6D422]"
+                    className="h-[48px] w-full bg-[#191C25] border border-[#1E2130] rounded-lg pl-10 pr-3.5 text-[#E8EAF0] text-sm font-sans outline-none transition-all duration-200 placeholder:text-[#6B7280] placeholder:opacity-55 hover:border-[#252A3A] focus-visible:border-[#06B6D4] focus-visible:ring-[3px] focus-visible:ring-[#06B6D422] sm:w-[240px]"
                   />
                 </div>
 
@@ -522,7 +524,7 @@ export default function Clientes({ onBack }: ClientesProps) {
                   value={show}
                   onValueChange={(v) => setShow(v as 'ativos' | 'todos')}
                 >
-                  <SelectTrigger className="w-[160px] h-[48px] bg-[#191C25] border-[#1E2130] text-[#E8EAF0] rounded-lg px-3.5 hover:bg-[#191C25] hover:text-[#E8EAF0] hover:border-[#252A3A]">
+                  <SelectTrigger className="h-[48px] w-full bg-[#191C25] border-[#1E2130] text-[#E8EAF0] rounded-lg px-3.5 hover:bg-[#191C25] hover:text-[#E8EAF0] hover:border-[#252A3A] sm:w-[160px]">
                     <SelectValue placeholder="Filtro" />
                   </SelectTrigger>
                   <SelectContent className="bg-[#13161D] border-[#1E2130] text-[#E8EAF0] rounded-xl shadow-[0_24px_64px_rgba(0,0,0,0.45)] overflow-hidden">
@@ -547,7 +549,7 @@ export default function Clientes({ onBack }: ClientesProps) {
               {filtered.map((c) => (
                 <div
                   key={c.id}
-                  className="p-4 bg-[#13161D] border border-[#1E2130] rounded-xl flex items-start justify-between gap-4 hover:bg-[#191C25] transition-colors duration-200"
+                  className="p-4 bg-[#13161D] border border-[#1E2130] rounded-xl flex flex-col gap-4 hover:bg-[#191C25] transition-colors duration-200 sm:flex-row sm:items-start sm:justify-between"
                 >
                   <div className="min-w-0">
                     <div className="flex items-center gap-2">
@@ -567,7 +569,7 @@ export default function Clientes({ onBack }: ClientesProps) {
                     </div>
                   </div>
 
-                  <div className="flex items-center gap-2 shrink-0">
+                  <div className="flex flex-wrap items-center gap-2 shrink-0">
                     <Button
                       type="button"
                       variant="ghost"

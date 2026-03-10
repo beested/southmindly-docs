@@ -3,15 +3,18 @@
 import { Button } from '@/components/ui/button';
 import { DOC_DEFINITIONS, PEOPLE_DEFINITIONS } from '@/lib/docs/registry';
 import { DocType } from '@/types/docs';
-import { useCallback, useEffect, useState } from 'react';
 import {
+  Building2,
   CheckCircle2,
+  FileBadge2,
   FileText,
+  FolderKanban,
   Plus,
   RefreshCw,
-  Rocket,
   Trash2,
+  Users,
 } from 'lucide-react';
+import { useCallback, useEffect, useMemo, useState } from 'react';
 
 type PautaListItem = {
   id: string;
@@ -21,220 +24,701 @@ type PautaListItem = {
   createdAt: string;
 };
 
+type PropostaListItem = {
+  id: string;
+  numeroProposta: number | null;
+  revisao: number | null;
+  status: string;
+  cidade: string;
+  dataProposta: string;
+  updatedAt: string;
+  clienteId: string;
+  assessorId: string;
+};
+
+type ClienteListItem = {
+  id: string;
+  razaoSocial: string;
+  cidade: string;
+  ativo: boolean;
+  createdAt: string;
+};
+
+type EscopoCatalogItem = {
+  id: string;
+  nome: string;
+  descricao: string;
+  tipoCobranca: string;
+  valorPadrao: number | null;
+  unidadeLabel: string;
+  ordem: number;
+};
+
+type ActivityItem = {
+  id: string;
+  kind: 'proposta' | 'pauta' | 'cliente';
+  title: string;
+  subtitle: string;
+  updatedAt: string;
+};
+
 interface DocHomeProps {
   onSelectDoc: (doc: DocType) => void;
   onOpenSavedPauta: (id: string) => void;
+}
+
+const statusLabels: Record<string, string> = {
+  rascunho: 'Rascunho',
+  enviada: 'Enviada',
+  em_negociacao: 'Em negociação',
+  aceita: 'Aceita',
+  recusada: 'Recusada',
+  cancelada: 'Cancelada',
+};
+
+const statusColors: Record<string, string> = {
+  rascunho: '#6B7280',
+  enviada: '#4F7EFF',
+  em_negociacao: '#F59E0B',
+  aceita: '#34D399',
+  recusada: '#F87171',
+  cancelada: '#9CA3AF',
+};
+
+function parseBrDate(value: string) {
+  const normalized = value.trim();
+  if (!/^\d{2}\/\d{2}\/\d{4}$/.test(normalized)) return null;
+
+  const [dayStr, monthStr, yearStr] = normalized.split('/');
+  const day = Number(dayStr);
+  const month = Number(monthStr);
+  const year = Number(yearStr);
+  const date = new Date(year, month - 1, day);
+
+  return Number.isNaN(date.getTime()) ? null : date;
+}
+
+function parseAnyDate(value: string) {
+  if (!value) return null;
+  const brDate = parseBrDate(value);
+  if (brDate) return brDate;
+
+  const parsed = new Date(value);
+  return Number.isNaN(parsed.getTime()) ? null : parsed;
+}
+
+function normalizeLabel(value: string, fallback: string) {
+  const normalized = value.trim();
+  return normalized ? normalized : fallback;
+}
+
+function getMonthKey(date: Date) {
+  return `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}`;
+}
+
+function getMonthLabel(key: string) {
+  const [yearStr, monthStr] = key.split('-');
+  const year = Number(yearStr);
+  const month = Number(monthStr);
+  return new Intl.DateTimeFormat('pt-BR', {
+    month: 'short',
+  })
+    .format(new Date(year, month - 1, 1))
+    .replace('.', '');
+}
+
+function getLastMonths(total: number) {
+  const result: string[] = [];
+  const now = new Date();
+
+  for (let index = total - 1; index >= 0; index -= 1) {
+    const date = new Date(now.getFullYear(), now.getMonth() - index, 1);
+    result.push(getMonthKey(date));
+  }
+
+  return result;
+}
+
+function ChartCard({
+  eyebrow,
+  title,
+  children,
+  action,
+}: {
+  eyebrow: string;
+  title: string;
+  children: React.ReactNode;
+  action?: React.ReactNode;
+}) {
+  return (
+    <section className="rounded-[22px] border border-[#1E2130] bg-[#13161D] p-6 shadow-[0_18px_50px_rgba(0,0,0,0.22)]">
+      <div className="mb-5 flex items-start justify-between gap-4">
+        <div>
+          <div className="text-[10px] font-mono uppercase tracking-[0.16em] text-[#6B7280]">
+            {eyebrow}
+          </div>
+          <h2 className="mt-2 text-[20px] font-semibold leading-tight text-[#F3F4F6]">
+            {title}
+          </h2>
+        </div>
+        {action}
+      </div>
+      {children}
+    </section>
+  );
+}
+
+function StatCard({
+  label,
+  value,
+  helper,
+  icon: Icon,
+  accent,
+}: {
+  label: string;
+  value: string;
+  helper: string;
+  icon: React.ComponentType<{ className?: string }>;
+  accent: string;
+}) {
+  return (
+    <div className="relative overflow-hidden rounded-[22px] border border-[#1E2130] bg-[#13161D] p-5">
+      <div
+        className="absolute inset-x-0 top-0 h-px"
+        style={{ background: `linear-gradient(90deg, ${accent}, transparent)` }}
+      />
+      <div className="flex items-start justify-between gap-4">
+        <div>
+          <div className="text-[11px] font-mono uppercase tracking-[0.14em] text-[#6B7280]">
+            {label}
+          </div>
+          <div className="mt-3 text-[34px] font-semibold leading-none text-[#F3F4F6]">
+            {value}
+          </div>
+          <div className="mt-2 text-[13px] leading-5 text-[#8B93A7]">
+            {helper}
+          </div>
+        </div>
+        <div
+          className="flex size-12 items-center justify-center rounded-2xl border"
+          style={{
+            backgroundColor: `${accent}18`,
+            borderColor: `${accent}40`,
+          }}
+        >
+          <Icon className="size-5" style={{ color: accent }} />
+        </div>
+      </div>
+    </div>
+  );
 }
 
 export default function DocHome({
   onSelectDoc,
   onOpenSavedPauta,
 }: DocHomeProps) {
-  const stats = [
-    { label: 'Documentos gerados', value: '0', icon: FileText },
-    { label: 'Templates ativos', value: '1', icon: CheckCircle2 },
-    { label: 'Em breve', value: '4', icon: Rocket },
-  ] as const;
-
   const [pautas, setPautas] = useState<PautaListItem[]>([]);
-  const [loadingPautas, setLoadingPautas] = useState(false);
-  const [pautasError, setPautasError] = useState<string | null>(null);
+  const [propostas, setPropostas] = useState<PropostaListItem[]>([]);
+  const [clientes, setClientes] = useState<ClienteListItem[]>([]);
+  const [escopos, setEscopos] = useState<EscopoCatalogItem[]>([]);
+  const [loadingDashboard, setLoadingDashboard] = useState(false);
+  const [dashboardError, setDashboardError] = useState<string | null>(null);
 
-  const refreshPautas = useCallback(async () => {
-    setLoadingPautas(true);
-    setPautasError(null);
+  const refreshDashboard = useCallback(async () => {
+    setLoadingDashboard(true);
+    setDashboardError(null);
+
     try {
-      const res = await fetch('/api/pautas', { cache: 'no-store' });
-      const json = (await res.json().catch(() => ({}))) as {
-        items?: PautaListItem[];
-        error?: string;
-      };
-      if (!res.ok) {
-        setPautasError(json.error ?? 'Erro ao carregar pautas');
-        setPautas([]);
-        return;
+      const [pautasRes, propostasRes, clientesRes, escoposRes] =
+        await Promise.all([
+          fetch('/api/pautas', { cache: 'no-store' }),
+          fetch('/api/propostas', { cache: 'no-store' }),
+          fetch('/api/clientes?all=1', { cache: 'no-store' }),
+          fetch('/api/escopos', { cache: 'no-store' }),
+        ]);
+
+      const [pautasJson, propostasJson, clientesJson, escoposJson] =
+        await Promise.all([
+          pautasRes.json().catch(() => ({})),
+          propostasRes.json().catch(() => ({})),
+          clientesRes.json().catch(() => ({})),
+          escoposRes.json().catch(() => ({})),
+        ]);
+
+      if (!pautasRes.ok) {
+        throw new Error(
+          (pautasJson as { error?: string }).error ??
+            'Erro ao carregar pautas',
+        );
       }
-      setPautas(Array.isArray(json.items) ? json.items : []);
+
+      if (!propostasRes.ok) {
+        throw new Error(
+          (propostasJson as { error?: string }).error ??
+            'Erro ao carregar propostas',
+        );
+      }
+
+      if (!clientesRes.ok) {
+        throw new Error(
+          (clientesJson as { error?: string }).error ??
+            'Erro ao carregar clientes',
+        );
+      }
+
+      if (!escoposRes.ok) {
+        throw new Error(
+          (escoposJson as { error?: string }).error ??
+            'Erro ao carregar escopos',
+        );
+      }
+
+      setPautas(
+        Array.isArray((pautasJson as { items?: PautaListItem[] }).items)
+          ? ((pautasJson as { items?: PautaListItem[] }).items ?? [])
+          : [],
+      );
+      setPropostas(
+        Array.isArray((propostasJson as { items?: PropostaListItem[] }).items)
+          ? ((propostasJson as { items?: PropostaListItem[] }).items ?? [])
+          : [],
+      );
+      setClientes(
+        Array.isArray((clientesJson as { items?: ClienteListItem[] }).items)
+          ? ((clientesJson as { items?: ClienteListItem[] }).items ?? [])
+          : [],
+      );
+      setEscopos(
+        Array.isArray((escoposJson as { items?: EscopoCatalogItem[] }).items)
+          ? ((escoposJson as { items?: EscopoCatalogItem[] }).items ?? [])
+          : [],
+      );
+    } catch (error) {
+      setDashboardError(
+        error instanceof Error ? error.message : 'Erro ao carregar dashboard',
+      );
     } finally {
-      setLoadingPautas(false);
+      setLoadingDashboard(false);
     }
   }, []);
 
   useEffect(() => {
-    refreshPautas();
-  }, [refreshPautas]);
+    refreshDashboard();
+  }, [refreshDashboard]);
 
   const deletePauta = async (id: string) => {
     if (!window.confirm('Excluir esta pauta?')) return;
     const res = await fetch(`/api/pautas/${id}`, { method: 'DELETE' });
     if (res.ok) {
-      refreshPautas();
+      refreshDashboard();
     }
   };
 
+  const availableTemplates =
+    DOC_DEFINITIONS.filter((doc) => doc.available).length +
+    PEOPLE_DEFINITIONS.filter((doc) => doc.available).length;
+  const activeClients = clientes.filter((cliente) => cliente.ativo);
+  const lastMonths = useMemo(() => getLastMonths(6), []);
+
+  const monthlyActivity = useMemo(() => {
+    return lastMonths.map((monthKey) => {
+      const propostasCount = propostas.filter((proposta) => {
+        const sourceDate =
+          parseAnyDate(proposta.dataProposta) ?? parseAnyDate(proposta.updatedAt);
+        return sourceDate ? getMonthKey(sourceDate) === monthKey : false;
+      }).length;
+
+      const pautasCount = pautas.filter((pauta) => {
+        const sourceDate =
+          parseAnyDate(pauta.createdAt) ?? parseAnyDate(pauta.updatedAt);
+        return sourceDate ? getMonthKey(sourceDate) === monthKey : false;
+      }).length;
+
+      return {
+        monthKey,
+        label: getMonthLabel(monthKey),
+        propostas: propostasCount,
+        pautas: pautasCount,
+      };
+    });
+  }, [lastMonths, pautas, propostas]);
+
+  const statusStats = useMemo(() => {
+    const base = Object.keys(statusLabels).map((key) => ({
+      key,
+      label: statusLabels[key],
+      value: propostas.filter((proposta) => proposta.status === key).length,
+      color: statusColors[key],
+    }));
+
+    return base.sort((a, b) => b.value - a.value);
+  }, [propostas]);
+
+  const cityStats = useMemo(() => {
+    const counts = new Map<string, number>();
+
+    for (const cliente of activeClients) {
+      const city = normalizeLabel(cliente.cidade, 'Sem cidade');
+      counts.set(city, (counts.get(city) ?? 0) + 1);
+    }
+
+    return Array.from(counts.entries())
+      .map(([label, value]) => ({ label, value }))
+      .sort((a, b) => b.value - a.value)
+      .slice(0, 5);
+  }, [activeClients]);
+
+  const escopoTypeStats = useMemo(() => {
+    const counts = new Map<string, number>();
+
+    for (const escopo of escopos) {
+      const label = normalizeLabel(escopo.tipoCobranca, 'Sem classificação');
+      counts.set(label, (counts.get(label) ?? 0) + 1);
+    }
+
+    return Array.from(counts.entries())
+      .map(([label, value]) => ({ label, value }))
+      .sort((a, b) => b.value - a.value)
+      .slice(0, 5);
+  }, [escopos]);
+
+  const recentActivity = useMemo<ActivityItem[]>(() => {
+    const proposalItems = propostas.map((proposta) => ({
+      id: proposta.id,
+      kind: 'proposta' as const,
+      title: `Proposta #${proposta.numeroProposta ?? '—'}`,
+      subtitle: `${statusLabels[proposta.status] ?? 'Sem status'} · Rev. ${
+        proposta.revisao ?? '—'
+      }`,
+      updatedAt: proposta.updatedAt,
+    }));
+
+    const pautaItems = pautas.map((pauta) => ({
+      id: pauta.id,
+      kind: 'pauta' as const,
+      title: pauta.titulo || 'Pauta sem título',
+      subtitle: pauta.docId,
+      updatedAt: pauta.updatedAt,
+    }));
+
+    const clienteItems = clientes
+      .filter((cliente) => cliente.createdAt)
+      .map((cliente) => ({
+        id: cliente.id,
+        kind: 'cliente' as const,
+        title: cliente.razaoSocial || 'Cliente sem nome',
+        subtitle: `${cliente.ativo ? 'Ativo' : 'Inativo'} · ${normalizeLabel(
+          cliente.cidade,
+          'Sem cidade',
+        )}`,
+        updatedAt: cliente.createdAt,
+      }));
+
+    return [...proposalItems, ...pautaItems, ...clienteItems]
+      .sort((a, b) => {
+        const aTime = parseAnyDate(a.updatedAt)?.getTime() ?? 0;
+        const bTime = parseAnyDate(b.updatedAt)?.getTime() ?? 0;
+        return bTime - aTime;
+      })
+      .slice(0, 8);
+  }, [clientes, pautas, propostas]);
+
+  const maxMonthlyValue = Math.max(
+    1,
+    ...monthlyActivity.map((item) => Math.max(item.propostas, item.pautas)),
+  );
+  const maxCityValue = Math.max(1, ...cityStats.map((item) => item.value));
+  const maxEscopoTypeValue = Math.max(
+    1,
+    ...escopoTypeStats.map((item) => item.value),
+  );
+  const maxStatusValue = Math.max(1, ...statusStats.map((item) => item.value));
+
+  const stats = [
+    {
+      label: 'Documentos gerados',
+      value: String(propostas.length + pautas.length),
+      helper: `${propostas.length} propostas e ${pautas.length} pautas`,
+      icon: FileText,
+      accent: '#4F7EFF',
+    },
+    {
+      label: 'Clientes cadastrados',
+      value: String(clientes.length),
+      helper: `${activeClients.length} ativos no momento`,
+      icon: Building2,
+      accent: '#34D399',
+    },
+    {
+      label: 'Escopos ativos',
+      value: String(escopos.length),
+      helper: 'Disponíveis para novas propostas',
+      icon: FolderKanban,
+      accent: '#6B19DB',
+    },
+    {
+      label: 'Templates disponíveis',
+      value: String(availableTemplates),
+      helper: 'Documentos e cadastros operacionais',
+      icon: CheckCircle2,
+      accent: '#F59E0B',
+    },
+  ] as const;
+
   return (
-    <div className="p-[40px_48px] max-w-[960px] w-full text-[#E8EAF0] font-sans">
-      {/* Hero */}
-      <div className="mb-12">
-        <div className="text-[11px] text-[#4F7EFF] tracking-[0.2em] uppercase mb-3 font-mono">
-          Sistema de Documentos
+    <div className="w-full px-4 py-20 text-[#E8EAF0] sm:px-6 lg:px-8 lg:py-10">
+      <div className="mx-auto max-w-[1380px]">
+        <div className="relative overflow-hidden rounded-[26px] border border-[#1E2130] bg-[radial-gradient(circle_at_top_left,#1E2A4A_0%,#13161D_36%,#0D0F14_100%)] p-5 shadow-[0_30px_80px_rgba(0,0,0,0.35)] sm:p-7 lg:rounded-[30px] lg:p-8">
+          <div className="absolute inset-y-0 right-0 hidden w-[38%] bg-[radial-gradient(circle_at_center,#6B19DB20_0%,transparent_70%)] lg:block" />
+          <div className="relative z-10 flex flex-col gap-8 lg:flex-row lg:items-end lg:justify-between">
+            <div className="max-w-[760px]">
+              <div className="text-[11px] font-mono uppercase tracking-[0.22em] text-[#4F7EFF]">
+                Dashboard Operacional
+              </div>
+              <h1 className="mt-4 text-[30px] font-semibold leading-[1.02] text-[#F8FAFC] sm:text-[36px] lg:text-[42px]">
+                Visão consolidada dos documentos e cadastros da operação.
+              </h1>
+              <p className="mt-4 max-w-[620px] text-[15px] leading-7 text-[#94A3B8]">
+                A dashboard agora usa dados reais do Supabase para acompanhar
+                propostas, pautas, clientes e escopos em um só lugar.
+              </p>
+            </div>
+
+            <div className="flex flex-wrap gap-3">
+              <Button
+                type="button"
+                variant="ghost"
+                onClick={refreshDashboard}
+                className="h-10 rounded-xl border border-[#2A3658] bg-[#101623] px-4 text-[13px] text-[#C7D2FE] hover:border-[#4F7EFF] hover:bg-[#101623]"
+              >
+                <RefreshCw
+                  className={`size-4 ${loadingDashboard ? 'animate-spin' : ''}`}
+                />
+                Atualizar dados
+              </Button>
+              <Button
+                type="button"
+                variant="ghost"
+                onClick={() => onSelectDoc('proposta-comercial')}
+                className="h-10 rounded-xl border border-[#34D39944] bg-[#34D39918] px-4 text-[13px] text-[#34D399] hover:bg-[#34D39930] hover:text-[#34D399]"
+              >
+                <Plus className="size-4" />
+                Nova proposta
+              </Button>
+            </div>
+          </div>
         </div>
 
-        <h1 className="text-4xl font-normal text-[#E8EAF0] mb-3 leading-tight">
-          Bem-vindo ao <br />
-          <img
-            src="/logo-full.png"
-            alt="SouthMindly Docs"
-            className="h-[42px] mt-2 block"
-          />
-        </h1>
-
-        <p className="text-[15px] text-[#6B7280] m-0 max-w-[520px] leading-relaxed">
-          Crie, padronize e automatize seus documentos empresariais. Escolha um
-          template abaixo para começar.
-        </p>
-      </div>
-
-      {/* Stats */}
-      <div className="grid grid-cols-3 gap-4 mb-12">
-        {stats.map((stat, i) => (
-          <div
-            key={i}
-            className="bg-[#13161D] border border-[#1E2130] rounded-xl p-5 flex items-center gap-4 transition-colors duration-200 hover:bg-[#191C25]"
-          >
-            <div className="w-10 h-10 rounded-xl flex items-center justify-center bg-[#1E2130] border border-[#252A3A]">
-              <stat.icon className="size-5 text-[#9CA3AF]" />
-            </div>
-            <div>
-              <div className="text-[26px] font-medium text-[#E8EAF0] leading-none mb-1 font-mono">
-                {stat.value}
-              </div>
-              <div className="text-xs text-[#6B7280] font-sans">
-                {stat.label}
-              </div>
-            </div>
+        {dashboardError ? (
+          <div className="mt-6 rounded-2xl border border-[#7F1D1D] bg-[#2A1114] px-5 py-4 text-sm text-[#FCA5A5]">
+            {dashboardError}
           </div>
-        ))}
-      </div>
+        ) : null}
 
-      {/* Divider */}
-      <div className="text-[11px] text-[#4B5563] tracking-[0.15em] uppercase mb-5 flex items-center gap-3 font-mono">
-        Templates disponíveis
-        <div className="flex-1 h-px bg-[#1E2130]" />
-      </div>
+        <div className="mt-8 grid gap-4 md:grid-cols-2 xl:grid-cols-4">
+          {stats.map((stat) => (
+            <StatCard key={stat.label} {...stat} />
+          ))}
+        </div>
 
-      {/* Cards Grid */}
-      <div className="grid grid-cols-[repeat(auto-fill,minmax(260px,1fr))] gap-4">
-        {DOC_DEFINITIONS.map((card) => (
-          <div
-            key={card.id}
-            className={`group ${
-              card.available ? 'cursor-pointer' : 'cursor-default opacity-55'
-            }`}
-            style={
-              {
-                '--card-color': card.color,
-              } as React.CSSProperties
+        <div className="mt-8 grid gap-4 xl:grid-cols-[1.45fr_1fr]">
+          <ChartCard
+            eyebrow="Ritmo"
+            title="Produção dos últimos 6 meses"
+            action={
+              <div className="rounded-full border border-[#1E2130] bg-[#0D0F14] px-3 py-1 text-[11px] font-mono uppercase tracking-[0.12em] text-[#8B93A7]">
+                Propostas x Pautas
+              </div>
             }
-            onClick={() => card.available && onSelectDoc(card.id)}
           >
-            <div
-              className={`bg-[#13161D] border border-[#1E2130] rounded-[14px] p-6 h-full relative overflow-hidden transition-all duration-[220ms] ease-out 
-              ${
-                card.available
-                  ? 'group-hover:-translate-y-[3px] group-hover:shadow-[0_8px_32px_rgba(0,0,0,0.4)] group-hover:border-[var(--card-color)]'
-                  : ''
-              }`}
-            >
-              {/* Top accent line */}
-              {card.available && (
-                <div
-                  className="absolute top-0 left-0 right-0 h-0.5 rounded-t-[14px]"
-                  style={{
-                    background: `linear-gradient(90deg, ${card.color}, ${card.color}00)`,
-                  }}
-                />
-              )}
-
-              <div className="flex justify-between items-start mb-4">
-	              <div
-	                className="w-11 h-11 rounded-xl flex items-center justify-center text-[22px]"
-	                style={{
-	                  background: card.available ? `${card.color}18` : '#1E2130',
-	                  border: `1px solid ${
-	                    card.available ? card.color + '33' : '#252A3A'
-	                  }`,
-	                }}
-	              >
-	                  <card.icon
-	                    className="size-[22px]"
-	                    style={{
-	                      color: card.available ? card.color : '#6B7280',
-	                    }}
-	                  />
-	              </div>
-
-                {card.badge && (
-                  <span className="text-[10px] bg-[#1E2130] text-[#4B5563] px-2 py-[3px] rounded-full tracking-[0.05em] font-mono">
-                    {card.badge}
-                  </span>
-                )}
-
-                {card.available && (
-                  <span
-                    className="text-[10px] px-2 py-[3px] rounded-full tracking-[0.05em] font-mono"
-                    style={{
-                      background: `${card.color}22`,
-                      color: card.color,
-                    }}
-                  >
-                    Disponível
-                  </span>
-                )}
-              </div>
-
-              <h3 className="text-[15px] font-semibold text-[#E8EAF0] m-0 mb-2 font-sans">
-                {card.label}
-              </h3>
-
-              <p className="text-[13px] text-[#6B7280] m-0 mb-5 leading-relaxed">
-                {card.description}
-              </p>
-
-              {card.available ? (
-                <div
-                  className="flex items-center gap-1.5 text-xs font-medium font-mono"
-                  style={{ color: card.color }}
-                >
-                  Criar documento →
+            <div className="-mx-1 overflow-x-auto px-1">
+              <div className="flex min-w-[560px] items-end gap-3 sm:min-w-0">
+              {monthlyActivity.map((item) => (
+                <div key={item.monthKey} className="flex flex-1 flex-col items-center">
+                  <div className="mb-3 flex h-[210px] w-full items-end justify-center gap-2 rounded-[20px] border border-[#1E2130] bg-[#0D0F1488] px-2 pb-3 pt-6">
+                    <div className="flex w-full max-w-[34px] flex-col items-center gap-2">
+                      <div className="text-[10px] font-mono text-[#6B7280]">
+                        {item.propostas}
+                      </div>
+                      <div
+                        className="w-full rounded-t-[10px] bg-[#4F7EFF]"
+                        style={{
+                          height: `${(item.propostas / maxMonthlyValue) * 150 + 12}px`,
+                        }}
+                      />
+                    </div>
+                    <div className="flex w-full max-w-[34px] flex-col items-center gap-2">
+                      <div className="text-[10px] font-mono text-[#6B7280]">
+                        {item.pautas}
+                      </div>
+                      <div
+                        className="w-full rounded-t-[10px] bg-[#34D399]"
+                        style={{
+                          height: `${(item.pautas / maxMonthlyValue) * 150 + 12}px`,
+                        }}
+                      />
+                    </div>
+                  </div>
+                  <div className="text-[11px] font-mono uppercase tracking-[0.12em] text-[#8B93A7]">
+                    {item.label}
+                  </div>
                 </div>
+              ))}
+              </div>
+            </div>
+
+            <div className="mt-4 flex gap-6 text-[12px] text-[#8B93A7]">
+              <div className="flex items-center gap-2">
+                <span className="size-2.5 rounded-full bg-[#4F7EFF]" />
+                Propostas
+              </div>
+              <div className="flex items-center gap-2">
+                <span className="size-2.5 rounded-full bg-[#34D399]" />
+                Pautas
+              </div>
+            </div>
+          </ChartCard>
+
+          <ChartCard eyebrow="Pipeline" title="Distribuição de propostas por status">
+            <div className="space-y-4">
+              {statusStats.map((item) => (
+                <div key={item.key}>
+                  <div className="mb-1.5 flex items-center justify-between gap-3 text-sm">
+                    <div className="flex items-center gap-2">
+                      <span
+                        className="size-2.5 rounded-full"
+                        style={{ backgroundColor: item.color }}
+                      />
+                      <span className="text-[#E8EAF0]">{item.label}</span>
+                    </div>
+                    <span className="font-mono text-[#9CA3AF]">{item.value}</span>
+                  </div>
+                  <div className="h-2.5 overflow-hidden rounded-full bg-[#191C25]">
+                    <div
+                      className="h-full rounded-full"
+                      style={{
+                        width: `${(item.value / maxStatusValue) * 100}%`,
+                        backgroundColor: item.color,
+                      }}
+                    />
+                  </div>
+                </div>
+              ))}
+            </div>
+          </ChartCard>
+        </div>
+
+        <div className="mt-4 grid gap-4 xl:grid-cols-[1fr_1fr_1.1fr]">
+          <ChartCard eyebrow="Clientes" title="Concentração por cidade">
+            <div className="space-y-4">
+              {cityStats.length > 0 ? (
+                cityStats.map((item) => (
+                  <div key={item.label}>
+                    <div className="mb-1.5 flex items-center justify-between gap-3 text-sm">
+                      <span className="text-[#E8EAF0]">{item.label}</span>
+                      <span className="font-mono text-[#9CA3AF]">{item.value}</span>
+                    </div>
+                    <div className="h-2.5 overflow-hidden rounded-full bg-[#191C25]">
+                      <div
+                        className="h-full rounded-full bg-[#34D399]"
+                        style={{
+                          width: `${(item.value / maxCityValue) * 100}%`,
+                        }}
+                      />
+                    </div>
+                  </div>
+                ))
               ) : (
-                <div className="text-xs text-[#374151] font-mono">
-                  Em desenvolvimento
+                <div className="rounded-2xl border border-[#1E2130] bg-[#0D0F1488] p-5 text-sm text-[#8B93A7]">
+                  Nenhum cliente cadastrado ainda.
                 </div>
               )}
             </div>
-          </div>
-        ))}
-      </div>
+          </ChartCard>
 
-      {PEOPLE_DEFINITIONS.length > 0 && (
-        <>
-          {/* Divider */}
-          <div className="text-[11px] text-[#4B5563] tracking-[0.15em] uppercase mt-12 mb-5 flex items-center gap-3 font-mono">
-            Pessoas
-            <div className="flex-1 h-px bg-[#1E2130]" />
+          <ChartCard eyebrow="Escopos" title="Modelos de cobrança mais usados">
+            <div className="space-y-4">
+              {escopoTypeStats.length > 0 ? (
+                escopoTypeStats.map((item, index) => (
+                  <div key={item.label}>
+                    <div className="mb-1.5 flex items-center justify-between gap-3 text-sm">
+                      <span className="text-[#E8EAF0]">{item.label}</span>
+                      <span className="font-mono text-[#9CA3AF]">{item.value}</span>
+                    </div>
+                    <div className="h-2.5 overflow-hidden rounded-full bg-[#191C25]">
+                      <div
+                        className="h-full rounded-full"
+                        style={{
+                          width: `${(item.value / maxEscopoTypeValue) * 100}%`,
+                          backgroundColor:
+                            ['#6B19DB', '#4F7EFF', '#34D399', '#F59E0B', '#F87171'][
+                              index % 5
+                            ],
+                        }}
+                      />
+                    </div>
+                  </div>
+                ))
+              ) : (
+                <div className="rounded-2xl border border-[#1E2130] bg-[#0D0F1488] p-5 text-sm text-[#8B93A7]">
+                  Nenhum escopo ativo encontrado.
+                </div>
+              )}
+            </div>
+          </ChartCard>
+
+          <ChartCard eyebrow="Atividade" title="Últimas movimentações">
+            <div className="space-y-3">
+              {recentActivity.length > 0 ? (
+                recentActivity.map((item) => (
+                  <div
+                    key={`${item.kind}-${item.id}`}
+                    className="flex items-start gap-3 rounded-2xl border border-[#1E2130] bg-[#0D0F1488] p-4"
+                  >
+                    <div className="mt-0.5 flex size-10 items-center justify-center rounded-2xl border border-[#252A3A] bg-[#13161D]">
+                      {item.kind === 'proposta' ? (
+                        <FileBadge2 className="size-4 text-[#4F7EFF]" />
+                      ) : item.kind === 'pauta' ? (
+                        <FileText className="size-4 text-[#34D399]" />
+                      ) : (
+                        <Users className="size-4 text-[#F59E0B]" />
+                      )}
+                    </div>
+                    <div className="min-w-0 flex-1">
+                      <div className="truncate text-[14px] font-medium text-[#E8EAF0]">
+                        {item.title}
+                      </div>
+                      <div className="mt-1 text-[12px] leading-5 text-[#8B93A7]">
+                        {item.subtitle}
+                      </div>
+                    </div>
+                    <div className="text-right text-[11px] font-mono text-[#6B7280]">
+                      {parseAnyDate(item.updatedAt)?.toLocaleDateString('pt-BR') ??
+                        '—'}
+                    </div>
+                  </div>
+                ))
+              ) : (
+                <div className="rounded-2xl border border-[#1E2130] bg-[#0D0F1488] p-5 text-sm text-[#8B93A7]">
+                  Nenhuma movimentação registrada ainda.
+                </div>
+              )}
+            </div>
+          </ChartCard>
+        </div>
+
+        <div className="mt-12">
+          <div className="mb-5 flex items-center gap-3 text-[11px] font-mono uppercase tracking-[0.15em] text-[#4B5563]">
+            Templates disponíveis
+            <div className="h-px flex-1 bg-[#1E2130]" />
           </div>
 
-          {/* Cards Grid */}
-          <div className="grid grid-cols-[repeat(auto-fill,minmax(260px,1fr))] gap-4">
-            {PEOPLE_DEFINITIONS.map((card) => (
+          <div className="grid grid-cols-1 gap-4 sm:grid-cols-[repeat(auto-fill,minmax(260px,1fr))]">
+            {DOC_DEFINITIONS.map((card) => (
               <div
                 key={card.id}
                 className={`group ${
-                  card.available
-                    ? 'cursor-pointer'
-                    : 'cursor-default opacity-55'
+                  card.available ? 'cursor-pointer' : 'cursor-default opacity-55'
                 }`}
                 style={
                   {
@@ -244,31 +728,27 @@ export default function DocHome({
                 onClick={() => card.available && onSelectDoc(card.id)}
               >
                 <div
-                  className={`bg-[#13161D] border border-[#1E2130] rounded-[14px] p-6 h-full relative overflow-hidden transition-all duration-[220ms] ease-out 
-                  ${
+                  className={`relative h-full overflow-hidden rounded-[18px] border border-[#1E2130] bg-[#13161D] p-6 transition-all duration-[220ms] ease-out ${
                     card.available
-                      ? 'group-hover:-translate-y-[3px] group-hover:shadow-[0_8px_32px_rgba(0,0,0,0.4)] group-hover:border-[var(--card-color)]'
+                      ? 'group-hover:-translate-y-[3px] group-hover:border-[var(--card-color)] group-hover:shadow-[0_18px_40px_rgba(0,0,0,0.28)]'
                       : ''
                   }`}
                 >
-                  {/* Top accent line */}
                   {card.available && (
                     <div
-                      className="absolute top-0 left-0 right-0 h-0.5 rounded-t-[14px]"
+                      className="absolute left-0 right-0 top-0 h-0.5"
                       style={{
-                        background: `linear-gradient(90deg, ${card.color}, ${card.color}00)`,
+                        background: `linear-gradient(90deg, ${card.color}, transparent)`,
                       }}
                     />
                   )}
 
-                  <div className="flex justify-between items-start mb-4">
+                  <div className="mb-4 flex items-start justify-between">
                     <div
-                      className="w-11 h-11 rounded-xl flex items-center justify-center text-[22px]"
+                      className="flex h-11 w-11 items-center justify-center rounded-2xl border"
                       style={{
                         background: card.available ? `${card.color}18` : '#1E2130',
-                        border: `1px solid ${
-                          card.available ? card.color + '33' : '#252A3A'
-                        }`,
+                        borderColor: card.available ? `${card.color}33` : '#252A3A',
                       }}
                     >
                       <card.icon
@@ -279,15 +759,9 @@ export default function DocHome({
                       />
                     </div>
 
-                    {card.badge && (
-                      <span className="text-[10px] bg-[#1E2130] text-[#4B5563] px-2 py-[3px] rounded-full tracking-[0.05em] font-mono">
-                        {card.badge}
-                      </span>
-                    )}
-
-                    {card.available && (
+                    {card.available ? (
                       <span
-                        className="text-[10px] px-2 py-[3px] rounded-full tracking-[0.05em] font-mono"
+                        className="rounded-full px-2 py-[3px] text-[10px] font-mono tracking-[0.05em]"
                         style={{
                           background: `${card.color}22`,
                           color: card.color,
@@ -295,116 +769,204 @@ export default function DocHome({
                       >
                         Disponível
                       </span>
-                    )}
+                    ) : card.badge ? (
+                      <span className="rounded-full bg-[#1E2130] px-2 py-[3px] text-[10px] font-mono tracking-[0.05em] text-[#4B5563]">
+                        {card.badge}
+                      </span>
+                    ) : null}
                   </div>
 
-                  <h3 className="text-[15px] font-semibold text-[#E8EAF0] m-0 mb-2 font-sans">
+                  <h3 className="mb-2 text-[15px] font-semibold text-[#E8EAF0]">
                     {card.label}
                   </h3>
-
-                  <p className="text-[13px] text-[#6B7280] m-0 mb-5 leading-relaxed">
+                  <p className="mb-5 text-[13px] leading-relaxed text-[#6B7280]">
                     {card.description}
                   </p>
 
-                  {card.available ? (
-                    <div
-                      className="flex items-center gap-1.5 text-xs font-medium font-mono"
-                      style={{ color: card.color }}
-                    >
-                      Gerenciar →
-                    </div>
-                  ) : (
-                    <div className="text-xs text-[#374151] font-mono">
-                      Em desenvolvimento
-                    </div>
-                  )}
+                  <div
+                    className="text-xs font-medium font-mono"
+                    style={{ color: card.available ? card.color : '#4B5563' }}
+                  >
+                    {card.available ? 'Criar documento →' : 'Em desenvolvimento'}
+                  </div>
                 </div>
               </div>
             ))}
           </div>
-        </>
-      )}
-
-      {/* Divider */}
-      <div className="text-[11px] text-[#4B5563] tracking-[0.15em] uppercase mt-12 mb-5 flex items-center gap-3 font-mono">
-        Meus documentos
-        <div className="flex-1 h-px bg-[#1E2130]" />
-      </div>
-
-      <div className="bg-[#13161D] border border-[#1E2130] rounded-2xl overflow-hidden">
-        <div className="px-6 py-4 border-b border-[#1E2130] flex items-center justify-between">
-          <div>
-            <div className="text-xs font-mono text-[#6B7280] tracking-[0.14em] uppercase">
-              Pautas de reunião
-            </div>
-            <div className="text-sm font-medium text-[#E8EAF0]">
-              {loadingPautas ? 'Carregando...' : `${pautas.length} item(ns)`}
-            </div>
-          </div>
-          <div className="flex items-center gap-2">
-            <Button
-              type="button"
-              variant="ghost"
-              onClick={refreshPautas}
-              className="h-9 px-3 rounded-lg border border-[#252A3A] bg-transparent text-[#9CA3AF] text-[12px] font-medium hover:border-[#4F7EFF44] hover:text-[#4F7EFF] hover:bg-transparent"
-              title="Atualizar lista"
-            >
-              <RefreshCw className="size-4" />
-              Atualizar
-            </Button>
-            <Button
-              type="button"
-              variant="ghost"
-              onClick={() => onSelectDoc('pauta-reuniao')}
-              className="h-9 px-4 rounded-lg bg-[#4F7EFF] text-white text-[12px] font-medium hover:bg-[#4F7EFF] hover:text-white"
-              title="Criar nova pauta"
-            >
-              <Plus className="size-4" />
-              Nova pauta
-            </Button>
-          </div>
         </div>
 
-        {pautasError && (
-          <div className="px-6 py-4 text-sm text-[#F87171] bg-[#F8717110] border-b border-[#1E2130]">
-            {pautasError}
+        {PEOPLE_DEFINITIONS.length > 0 && (
+          <div className="mt-12">
+            <div className="mb-5 flex items-center gap-3 text-[11px] font-mono uppercase tracking-[0.15em] text-[#4B5563]">
+              Pessoas
+              <div className="h-px flex-1 bg-[#1E2130]" />
+            </div>
+
+            <div className="grid grid-cols-1 gap-4 sm:grid-cols-[repeat(auto-fill,minmax(260px,1fr))]">
+              {PEOPLE_DEFINITIONS.map((card) => (
+                <div
+                  key={card.id}
+                  className={`group ${
+                    card.available
+                      ? 'cursor-pointer'
+                      : 'cursor-default opacity-55'
+                  }`}
+                  style={
+                    {
+                      '--card-color': card.color,
+                    } as React.CSSProperties
+                  }
+                  onClick={() => card.available && onSelectDoc(card.id)}
+                >
+                  <div
+                    className={`relative h-full overflow-hidden rounded-[18px] border border-[#1E2130] bg-[#13161D] p-6 transition-all duration-[220ms] ease-out ${
+                      card.available
+                        ? 'group-hover:-translate-y-[3px] group-hover:border-[var(--card-color)] group-hover:shadow-[0_18px_40px_rgba(0,0,0,0.28)]'
+                        : ''
+                    }`}
+                  >
+                    {card.available && (
+                      <div
+                        className="absolute left-0 right-0 top-0 h-0.5"
+                        style={{
+                          background: `linear-gradient(90deg, ${card.color}, transparent)`,
+                        }}
+                      />
+                    )}
+
+                    <div className="mb-4 flex items-start justify-between">
+                      <div
+                        className="flex h-11 w-11 items-center justify-center rounded-2xl border"
+                        style={{
+                          background: card.available ? `${card.color}18` : '#1E2130',
+                          borderColor: card.available
+                            ? `${card.color}33`
+                            : '#252A3A',
+                        }}
+                      >
+                        <card.icon
+                          className="size-[22px]"
+                          style={{
+                            color: card.available ? card.color : '#6B7280',
+                          }}
+                        />
+                      </div>
+
+                      {card.available ? (
+                        <span
+                          className="rounded-full px-2 py-[3px] text-[10px] font-mono tracking-[0.05em]"
+                          style={{
+                            background: `${card.color}22`,
+                            color: card.color,
+                          }}
+                        >
+                          Disponível
+                        </span>
+                      ) : card.badge ? (
+                        <span className="rounded-full bg-[#1E2130] px-2 py-[3px] text-[10px] font-mono tracking-[0.05em] text-[#4B5563]">
+                          {card.badge}
+                        </span>
+                      ) : null}
+                    </div>
+
+                    <h3 className="mb-2 text-[15px] font-semibold text-[#E8EAF0]">
+                      {card.label}
+                    </h3>
+                    <p className="mb-5 text-[13px] leading-relaxed text-[#6B7280]">
+                      {card.description}
+                    </p>
+
+                    <div
+                      className="text-xs font-medium font-mono"
+                      style={{ color: card.available ? card.color : '#4B5563' }}
+                    >
+                      {card.available ? 'Gerenciar →' : 'Em desenvolvimento'}
+                    </div>
+                  </div>
+                </div>
+              ))}
+            </div>
           </div>
         )}
 
-        <div className="max-h-[50vh] overflow-auto divide-y divide-[#1E2130]">
-          {!loadingPautas && pautas.length === 0 && !pautasError && (
-            <div className="p-6 text-sm text-[#6B7280]">
-              Nenhuma pauta salva ainda.
-            </div>
-          )}
+        <div className="mt-12">
+          <div className="mb-5 flex items-center gap-3 text-[11px] font-mono uppercase tracking-[0.15em] text-[#4B5563]">
+            Meus documentos
+            <div className="h-px flex-1 bg-[#1E2130]" />
+          </div>
 
-          {pautas.map((p) => (
-            <div key={p.id} className="p-5 flex items-center gap-3">
-              <Button
-                type="button"
-                variant="ghost"
-                onClick={() => onOpenSavedPauta(p.id)}
-                className="h-auto flex-1 text-left justify-start px-0 py-0 hover:bg-transparent"
-              >
-                <div className="text-sm font-medium text-[#E8EAF0] truncate">
-                  {p.titulo || 'Sem título'}
+          <div className="overflow-hidden rounded-[24px] border border-[#1E2130] bg-[#13161D]">
+            <div className="flex items-center justify-between border-b border-[#1E2130] px-6 py-4">
+              <div>
+                <div className="text-xs font-mono uppercase tracking-[0.14em] text-[#6B7280]">
+                  Pautas de reunião
                 </div>
-                <div className="text-[11px] text-[#6B7280] font-mono mt-1">
-                  {p.docId} · atualizado{' '}
-                  {new Date(p.updatedAt).toLocaleString('pt-BR')}
+                <div className="text-sm font-medium text-[#E8EAF0]">
+                  {loadingDashboard ? 'Carregando...' : `${pautas.length} item(ns)`}
                 </div>
-              </Button>
-              <Button
-                type="button"
-                variant="destructive"
-                onClick={() => deletePauta(p.id)}
-                title="Excluir"
-              >
-                <Trash2 className="size-4" />
-                Excluir
-              </Button>
+              </div>
+              <div className="flex items-center gap-2">
+                <Button
+                  type="button"
+                  variant="ghost"
+                  onClick={refreshDashboard}
+                  className="h-9 rounded-lg border border-[#252A3A] bg-transparent px-3 text-[12px] text-[#9CA3AF] hover:border-[#4F7EFF44] hover:text-[#4F7EFF] hover:bg-transparent"
+                  title="Atualizar lista"
+                >
+                  <RefreshCw
+                    className={`size-4 ${loadingDashboard ? 'animate-spin' : ''}`}
+                  />
+                  Atualizar
+                </Button>
+                <Button
+                  type="button"
+                  variant="ghost"
+                  onClick={() => onSelectDoc('pauta-reuniao')}
+                  className="h-9 rounded-lg bg-[#4F7EFF] px-4 text-[12px] text-white hover:bg-[#4F7EFF] hover:text-white"
+                  title="Criar nova pauta"
+                >
+                  <Plus className="size-4" />
+                  Nova pauta
+                </Button>
+              </div>
             </div>
-          ))}
+
+            <div className="max-h-[50vh] divide-y divide-[#1E2130] overflow-auto">
+              {!loadingDashboard && pautas.length === 0 && !dashboardError && (
+                <div className="p-6 text-sm text-[#6B7280]">
+                  Nenhuma pauta salva ainda.
+                </div>
+              )}
+
+              {pautas.map((pauta) => (
+                <div key={pauta.id} className="flex items-center gap-3 p-5">
+                  <Button
+                    type="button"
+                    variant="ghost"
+                    onClick={() => onOpenSavedPauta(pauta.id)}
+                    className="h-auto flex-1 justify-start px-0 py-0 text-left hover:bg-transparent"
+                  >
+                    <div className="text-sm font-medium text-[#E8EAF0] truncate">
+                      {pauta.titulo || 'Sem título'}
+                    </div>
+                    <div className="mt-1 text-[11px] font-mono text-[#6B7280]">
+                      {pauta.docId} · atualizado{' '}
+                      {new Date(pauta.updatedAt).toLocaleString('pt-BR')}
+                    </div>
+                  </Button>
+                  <Button
+                    type="button"
+                    variant="destructive"
+                    onClick={() => deletePauta(pauta.id)}
+                    title="Excluir"
+                  >
+                    <Trash2 className="size-4" />
+                    Excluir
+                  </Button>
+                </div>
+              ))}
+            </div>
+          </div>
         </div>
       </div>
     </div>

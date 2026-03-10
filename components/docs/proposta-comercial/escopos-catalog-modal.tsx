@@ -1,7 +1,5 @@
 'use client';
 
-import { Plus } from 'lucide-react';
-
 import { Button } from '@/components/ui/button';
 import { PropostaEscopoData } from '@/types/docs';
 
@@ -40,8 +38,8 @@ export function EscoposCatalogModal({
   });
 
   return (
-    <div className="fixed inset-0 z-[500] bg-black/60 flex items-center justify-center p-6 print:hidden">
-      <div className="w-full max-w-2xl bg-[#13161D] border border-[#1E2130] rounded-2xl shadow-[0_24px_64px_rgba(0,0,0,0.45)] overflow-hidden">
+    <div className="fixed inset-0 z-[500] bg-black/60 flex items-start justify-center sm-textarea-scrollbar p-4 sm:items-center sm:p-6 print:hidden">
+      <div className="flex w-full max-w-3xl flex-col overflow-hidden rounded-2xl border border-[#1E2130] bg-[#13161D] shadow-[0_24px_64px_rgba(0,0,0,0.45)] max-h-[calc(100vh-2rem)] sm:max-h-[85vh]">
         <div className="px-6 py-4 border-b border-[#1E2130] flex items-center justify-between">
           <div>
             <div className="text-xs font-mono text-[#6B7280] tracking-[0.14em] uppercase">
@@ -70,51 +68,61 @@ export function EscoposCatalogModal({
           />
         </div>
 
-        <div className="max-h-[60vh] overflow-auto divide-y divide-[#1E2130]">
+        <div className="overflow-y-auto overflow-x-hidden p-4 sm:p-5">
           {filteredEscopos.map((escopo) => {
             const alreadySelected = escoposSelecionados.some(
               (item) => item.escopoId === escopo.id,
             );
 
             return (
-              <div key={escopo.id} className="p-5 flex items-start gap-3">
-                <Button
-                  type="button"
-                  variant="ghost"
-                  onClick={() => onAddEscopo(escopo)}
-                  disabled={alreadySelected}
-                  className="h-auto flex-1 text-left justify-start px-0 py-0 hover:bg-transparent disabled:opacity-60"
-                >
-                  <div className="text-sm font-medium text-[#E8EAF0] truncate">
-                    {escopo.nome}
-                  </div>
-                  <div className="text-[11px] text-[#6B7280] font-mono mt-1">
-                    {escopo.tipoCobranca || 'Escopo'}
-                    {escopo.unidadeLabel ? ` · ${escopo.unidadeLabel}` : ''}
-                    {escopo.descricao ? ` · ${escopo.descricao}` : ''}
-                  </div>
-                </Button>
-                <Button
-                  type="button"
-                  variant="ghost"
-                  size="xs"
-                  onClick={() => onAddEscopo(escopo)}
-                  disabled={alreadySelected}
-                  className={`h-8 px-3 rounded-lg border ${
-                    alreadySelected
-                      ? 'border-[#252A3A] text-[#6B7280] bg-transparent hover:bg-transparent'
-                      : 'border-[#34D39944] text-[#34D399] bg-[#34D39918] hover:bg-[#34D39933] hover:text-[#34D399]'
-                  }`}
-                >
-                  <Plus className="size-4" />
-                  {alreadySelected ? 'Adicionado' : 'Adicionar'}
-                </Button>
+              <div
+                key={escopo.id}
+                className="mb-3 rounded-xl border border-[#1E2130] bg-[#171B24] p-2 transition-colors duration-200 hover:border-[#252A3A] hover:bg-[#1A1F29] last:mb-0"
+              >
+                <div className="flex flex-col  gap-4 sm:flex-row sm:items-start sm:justify-between">
+                  <Button
+                    type="button"
+                    variant="ghost"
+                    onClick={() => onAddEscopo(escopo)}
+                    disabled={alreadySelected}
+                    className="h-auto min-w-0 flex-1 items-start justify-start whitespace-normal px-0 py-0 text-left hover:bg-transparent disabled:opacity-60"
+                  >
+                    <div className="w-full p-2 min-w-0 space-y-2">
+                      <div className="flex flex-wrap items-center gap-2">
+                        <div className="text-sm font-medium text-[#E8EAF0] break-words">
+                          {escopo.nome}
+                        </div>
+                        <span className="rounded-full border border-[#252A3A] bg-[#191C25] px-2 py-1 text-[10px] font-mono uppercase tracking-[0.12em] text-[#8B93A7]">
+                          {escopo.tipoCobranca || 'Escopo'}
+                        </span>
+                      </div>
+
+                      {(escopo.descricao || escopo.unidadeLabel) && (
+                        <div className="space-y-2">
+                          {escopo.descricao && (
+                            <p className="text-xs leading-5 text-[#A7AFBF] break-words">
+                              {escopo.descricao}
+                            </p>
+                          )}
+
+                          <div className="flex flex-wrap gap-2 text-[11px] font-mono text-[#6B7280]">
+                            {escopo.unidadeLabel && (
+                              <span className="rounded-md bg-[#0D0F1488] px-2 py-1">
+                                Unidade: {escopo.unidadeLabel}
+                              </span>
+                            )}
+                          </div>
+                        </div>
+                      )}
+                    </div>
+                  </Button>
+                </div>
               </div>
             );
           })}
 
           {escoposCatalogo.length === 0 && (
-            <div className="p-6 text-sm text-[#6B7280]">
+            <div className="rounded-xl border border-[#1E2130] bg-[#171B24] p-6 text-sm text-[#6B7280]">
               Nenhum escopo ativo encontrado.
             </div>
           )}

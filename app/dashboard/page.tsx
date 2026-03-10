@@ -5,19 +5,22 @@ import Sidebar from '@/components/dashboard/sidebar';
 import Clientes from '@/components/docs/clientes';
 import PautaReuniao from '@/components/docs/pauta-reuniao';
 import PropostaComercial from '@/components/docs/proposta-comercial';
-import { DocType } from '@/types/docs';
-import { useEffect, useMemo, useState } from 'react';
-import { useRouter } from 'next/navigation';
 import { createSupabaseBrowserClient } from '@/lib/supabase/browser';
+import { DocType } from '@/types/docs';
+import { PanelLeft } from 'lucide-react';
+import { useRouter } from 'next/navigation';
+import { useEffect, useMemo, useState } from 'react';
 
 export default function DashboardPage() {
   const router = useRouter();
   const supabase = useMemo(() => createSupabaseBrowserClient(), []);
 
   const [activeDoc, setActiveDoc] = useState<DocType | null>(null);
-  const [sidebarOpen, setSidebarOpen] = useState(true);
+  const [isMobile, setIsMobile] = useState(false);
+  const [desktopSidebarOpen, setDesktopSidebarOpen] = useState(true);
+  const [mobileSidebarOpen, setMobileSidebarOpen] = useState(false);
   const [userEmail, setUserEmail] = useState<string | null>(null);
-  const [openSavedPautasToken, setOpenSavedPautasToken] = useState(0);
+  const [openSavedPautasToken] = useState(0);
   const [openSavedPautaId, setOpenSavedPautaId] = useState<string | null>(null);
 
   useEffect(() => {
@@ -26,12 +29,28 @@ export default function DashboardPage() {
       .then(({ data }) => setUserEmail(data.user?.email ?? null));
   }, [supabase]);
 
+  useEffect(() => {
+    const syncViewport = () => {
+      const mobile = window.innerWidth < 1024;
+      setIsMobile(mobile);
+      if (!mobile) {
+        setMobileSidebarOpen(false);
+      }
+    };
+
+    syncViewport();
+    window.addEventListener('resize', syncViewport);
+    return () => window.removeEventListener('resize', syncViewport);
+  }, []);
+
   const handleSelectDoc = (doc: DocType) => {
     setActiveDoc(doc);
+    if (isMobile) setMobileSidebarOpen(false);
   };
 
   const handleBack = () => {
     setActiveDoc(null);
+    if (isMobile) setMobileSidebarOpen(false);
   };
 
   const handleSignOut = async () => {
@@ -40,15 +59,10 @@ export default function DashboardPage() {
     router.refresh();
   };
 
-  const handleConsultSavedPautas = () => {
-    setActiveDoc('pauta-reuniao');
-    setOpenSavedPautaId(null);
-    setOpenSavedPautasToken((t) => t + 1);
-  };
-
   const handleOpenSavedPauta = (id: string) => {
     setActiveDoc('pauta-reuniao');
     setOpenSavedPautaId(id);
+    if (isMobile) setMobileSidebarOpen(false);
   };
 
   const renderContent = () => {
@@ -76,26 +90,53 @@ export default function DashboardPage() {
   };
 
   return (
-    <div style={{ display: 'flex', minHeight: '100vh', background: '#0D0F14' }}>
+    <div className="flex min-h-screen bg-[#0D0F14]">
+      {isMobile && mobileSidebarOpen ? (
+        <button
+          type="button"
+          aria-label="Fechar menu"
+          onClick={() => setMobileSidebarOpen(false)}
+          className="fixed inset-0 z-[180] bg-black/50 lg:hidden"
+        />
+      ) : null}
+
       <Sidebar
-        open={sidebarOpen}
-        onToggle={() => setSidebarOpen(!sidebarOpen)}
+        open={isMobile ? mobileSidebarOpen : desktopSidebarOpen}
+        isMobile={isMobile}
+        onToggle={() => {
+          if (isMobile) {
+            setMobileSidebarOpen((current) => !current);
+            return;
+          }
+
+          setDesktopSidebarOpen((current) => !current);
+        }}
         activeDoc={activeDoc}
         onSelectDoc={handleSelectDoc}
         onHome={handleBack}
         userEmail={userEmail}
         onSignOut={handleSignOut}
-        onConsultSavedPautas={handleConsultSavedPautas}
       />
+
+      {isMobile ? (
+        <button
+          type="button"
+          onClick={() => setMobileSidebarOpen(true)}
+          className="fixed left-4 top-4 z-[190] flex size-11 items-center justify-center rounded-2xl border border-[#1E2130] bg-[#13161D] text-[#E8EAF0] shadow-[0_14px_30px_rgba(0,0,0,0.35)] lg:hidden"
+          aria-label="Abrir menu"
+        >
+          <PanelLeft className="size-5" />
+        </button>
+      ) : null}
+
       <main
-        style={{
-          flex: 1,
-          marginLeft: sidebarOpen ? '260px' : '64px',
-          transition: 'margin-left 0.3s ease',
-          minHeight: '100vh',
-          display: 'flex',
-          flexDirection: 'column',
-        }}
+        className={`flex min-h-screen flex-1 flex-col transition-[margin] duration-300 ease-out ${
+          isMobile
+            ? 'ml-0'
+            : desktopSidebarOpen
+              ? 'lg:ml-[260px]'
+              : 'lg:ml-[64px]'
+        }`}
       >
         {renderContent()}
       </main>
