@@ -1,7 +1,10 @@
 'use client';
 
 import DocHome from '@/components/dashboard/docHome';
-import Sidebar from '@/components/dashboard/sidebar';
+import Sidebar, {
+  DESKTOP_SIDEBAR_CLOSED_WIDTH,
+  DESKTOP_SIDEBAR_OPEN_WIDTH,
+} from '@/components/dashboard/sidebar';
 import Clientes from '@/components/docs/clientes';
 import PautaReuniao from '@/components/docs/pauta-reuniao';
 import PropostaComercial from '@/components/docs/proposta-comercial';
@@ -64,6 +67,10 @@ export default function DashboardPage() {
     setOpenSavedPautaId(id);
     if (isMobile) setMobileSidebarOpen(false);
   };
+
+  const desktopSidebarWidth = desktopSidebarOpen
+    ? DESKTOP_SIDEBAR_OPEN_WIDTH
+    : DESKTOP_SIDEBAR_CLOSED_WIDTH;
 
   const renderContent = () => {
     switch (activeDoc) {
@@ -130,13 +137,11 @@ export default function DashboardPage() {
       ) : null}
 
       <main
-        className={`flex min-h-screen flex-1 flex-col transition-[margin] duration-300 ease-out ${
-          isMobile
-            ? 'ml-0'
-            : desktopSidebarOpen
-              ? 'lg:ml-[260px]'
-              : 'lg:ml-[64px]'
-        }`}
+        className="flex min-h-screen min-w-0 flex-col transition-[margin,width] duration-300 ease-out"
+        style={{
+          marginLeft: isMobile ? 0 : desktopSidebarWidth,
+          width: isMobile ? '100%' : `calc(100% - ${desktopSidebarWidth}px)`,
+        }}
       >
         {renderContent()}
       </main>

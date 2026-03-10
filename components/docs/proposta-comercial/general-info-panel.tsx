@@ -3,12 +3,7 @@
 import { DatePicker } from '@/components/ui/date-picker';
 import { PropostaComercialData } from '@/types/docs';
 
-import {
-  Field,
-  MultiSelectField,
-  SelectField,
-  TextAreaField,
-} from './form-fields';
+import { Field, SelectField, TextAreaField } from './form-fields';
 import { AssessorItem, ClienteItem, SelectOption } from './types';
 
 interface GeneralInfoPanelProps {
@@ -78,7 +73,7 @@ export function GeneralInfoPanel({
         placeholder="Selecione o cliente"
       />
 
-      <MultiSelectField
+      {/*   <MultiSelectField
         label="Assessores"
         values={selectedAssessorIds}
         onChange={(assessorIds) =>
@@ -89,7 +84,7 @@ export function GeneralInfoPanel({
           label: assessor.nome || assessor.id,
         }))}
         placeholder="Selecione um ou mais assessores"
-      />
+      /> */}
 
       <div className="grid grid-cols-1 gap-2.5 sm:grid-cols-2">
         <div className="mb-4">

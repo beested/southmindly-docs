@@ -4,6 +4,11 @@ import { Button } from '@/components/ui/button';
 import { DOC_DEFINITIONS, PEOPLE_DEFINITIONS } from '@/lib/docs/registry';
 import { DocType } from '@/types/docs';
 import { LogOut } from 'lucide-react';
+import Image from 'next/image';
+
+export const DESKTOP_SIDEBAR_OPEN_WIDTH = 284;
+export const DESKTOP_SIDEBAR_CLOSED_WIDTH = 64;
+export const MOBILE_SIDEBAR_WIDTH = 300;
 
 interface SidebarProps {
   open: boolean;
@@ -30,32 +35,80 @@ export default function Sidebar({
     <aside
       className={`fixed top-0 left-0 z-[200] flex h-screen flex-col overflow-hidden border-r border-[#1E2130] bg-[#13161D] transition-all duration-300 ease-out ${
         isMobile
-          ? `w-[280px] max-w-[86vw] ${open ? 'translate-x-0' : '-translate-x-full'} shadow-[0_24px_80px_rgba(0,0,0,0.45)]`
-          : open
-            ? 'w-[260px]'
-            : 'w-[64px]'
+          ? `${open ? 'translate-x-0' : '-translate-x-full'} shadow-[0_24px_80px_rgba(0,0,0,0.45)]`
+          : ''
       }`}
+      style={
+        isMobile
+          ? { width: `${MOBILE_SIDEBAR_WIDTH}px`, maxWidth: '88vw' }
+          : {
+              width: `${
+                open
+                  ? DESKTOP_SIDEBAR_OPEN_WIDTH
+                  : DESKTOP_SIDEBAR_CLOSED_WIDTH
+              }px`,
+            }
+      }
     >
       {/* Header */}
-      <div className="h-[60px] px-4 flex items-center justify-between border-b border-[#1E2130] shrink-0">
+      <div
+        className={`relative flex items-center border-b border-[#1E2130] shrink-0 ${
+          open ? 'h-[76px] px-3.5' : 'h-[76px] px-2.5'
+        }`}
+      >
         {open && (
           <Button
             type="button"
             variant="ghost"
             onClick={onHome}
-            className="h-auto w-auto bg-transparent hover:bg-transparent border-none cursor-pointer p-0"
+            className="group relative h-auto min-w-0 flex-1 justify-start overflow-hidden rounded-[18px] border border-[#2A3145] bg-[linear-gradient(135deg,rgba(79,126,255,0.16),rgba(19,22,29,0.98)_58%)] px-3 py-2.5 text-left shadow-[0_14px_30px_rgba(0,0,0,0.28)] transition-all duration-200 hover:border-[#3B4764] hover:bg-[linear-gradient(135deg,rgba(79,126,255,0.22),rgba(19,22,29,1)_62%)]"
+            aria-label="Voltar para a home"
           >
-            <img src="/logo-full.png" alt="SouthMindly" className="h-8" />
+            <span className="pointer-events-none absolute inset-y-0 right-0 w-16 bg-[radial-gradient(circle_at_center,rgba(79,126,255,0.22),transparent_72%)] opacity-90 transition-opacity duration-200 group-hover:opacity-100" />
+            <span className="relative flex items-center gap-3">
+              <span className="flex h-10 w-10 items-center justify-center rounded-[14px] border border-[#FFFFFF14] bg-[#11141C]/80 shadow-[inset_0_1px_0_rgba(255,255,255,0.05)]">
+                <Image
+                  src="/logo-icon.png"
+                  alt=""
+                  width={22}
+                  height={27}
+                  className="h-[27px] w-auto"
+                />
+              </span>
+              <span className="min-w-0">
+                <Image
+                  src="/logo-full.png"
+                  alt="SouthMindly"
+                  width={665}
+                  height={138}
+                  className="h-[26px] w-auto max-w-[146px]"
+                  priority
+                />
+                <span className="mt-1 block text-[10px] uppercase tracking-[0.22em] text-[#7E879B] font-mono">
+                  Docs Workspace
+                </span>
+              </span>
+            </span>
           </Button>
         )}
 
         {!open && !isMobile && (
-          <div
-            className="flex items-center justify-center cursor-pointer mx-auto"
+          <Button
+            type="button"
+            variant="ghost"
             onClick={onHome}
+            className="group relative mx-auto flex h-12 w-12 items-center justify-center rounded-[18px] border border-[#2A3145] bg-[linear-gradient(180deg,rgba(79,126,255,0.18),rgba(19,22,29,1))] p-0 shadow-[0_14px_28px_rgba(0,0,0,0.26)] transition-all duration-200 hover:border-[#3B4764] hover:scale-[1.03]"
+            aria-label="Voltar para a home"
           >
-            <img src="/logo-icon.png" alt="SouthMindly" className="w-8 h-8" />
-          </div>
+            <span className="absolute inset-[1px] rounded-[17px] bg-[radial-gradient(circle_at_top,rgba(255,255,255,0.1),transparent_52%)] opacity-70" />
+            <Image
+              src="/logo-icon.png"
+              alt="SouthMindly"
+              width={24}
+              height={30}
+              className="relative h-[30px] w-auto drop-shadow-[0_6px_14px_rgba(79,126,255,0.28)]"
+            />
+          </Button>
         )}
 
         {open && (
@@ -63,7 +116,7 @@ export default function Sidebar({
             type="button"
             variant="ghost"
             onClick={onToggle}
-            className="h-auto w-auto bg-transparent border-none text-[#6B7280] cursor-pointer p-1.5 rounded-md text-base flex items-center justify-center hover:bg-[#1E2130]"
+            className="ml-2 h-10 w-10 shrink-0 rounded-xl border border-transparent bg-transparent p-0 text-base text-[#6B7280] transition-colors hover:border-[#252A3A] hover:bg-[#1E2130] hover:text-[#CDD5E1]"
           >
             {isMobile ? '✕' : '‹'}
           </Button>
@@ -75,7 +128,7 @@ export default function Sidebar({
           type="button"
           variant="ghost"
           onClick={onToggle}
-          className="h-auto w-auto bg-transparent border-none text-[#6B7280] cursor-pointer p-2.5 text-base flex items-center justify-center mt-1 hover:bg-[#1E2130]"
+          className="mx-auto mt-2 flex h-9 w-9 items-center justify-center rounded-xl border border-transparent bg-transparent p-0 text-base text-[#6B7280] transition-colors hover:border-[#252A3A] hover:bg-[#1E2130] hover:text-[#CDD5E1]"
         >
           ›
         </Button>

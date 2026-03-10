@@ -317,49 +317,49 @@ export default function Clientes({ onBack }: ClientesProps) {
     <div className="min-h-screen bg-[#0D0F14] font-sans text-[#E8EAF0] flex flex-col">
       <header className="border-b border-[#1E2130] bg-[#0D0F14EE] px-4 py-3 backdrop-blur-md sm:px-6 lg:px-8">
         <div className="flex flex-col gap-3 lg:flex-row lg:items-center lg:justify-between">
-        <div className="flex min-w-0 items-center gap-4">
-          <Button
-            type="button"
-            variant="ghost"
-            onClick={onBack}
-            className="h-auto bg-transparent hover:bg-transparent border-none text-[#6B7280] cursor-pointer text-lg p-1 px-2 flex items-center transition-colors duration-200 hover:text-[#E8EAF0]"
-          >
-            ←
-          </Button>
-          <div className="w-px h-5 bg-[#1E2130]" />
-          <div>
-            <div className="text-[10px] font-mono text-[#6B7280] tracking-[0.1em] uppercase">
-              Cadastro
-            </div>
-            <div className="text-[13px] font-sans text-[#E8EAF0] font-medium">
-              Clientes
+          <div className="flex min-w-0 items-center gap-4">
+            <Button
+              type="button"
+              variant="ghost"
+              onClick={onBack}
+              className="h-auto bg-transparent hover:bg-transparent border-none text-[#6B7280] cursor-pointer text-lg p-1 px-2 flex items-center transition-colors duration-200 hover:text-[#E8EAF0]"
+            >
+              ←
+            </Button>
+            <div className="w-px h-5 bg-[#1E2130]" />
+            <div>
+              <div className="text-[10px] font-mono text-[#6B7280] tracking-[0.1em] uppercase">
+                Cadastro
+              </div>
+              <div className="text-[13px] font-sans text-[#E8EAF0] font-medium">
+                Clientes
+              </div>
             </div>
           </div>
-        </div>
 
-        <div className="flex flex-wrap items-center gap-2">
-          <Button
-            type="button"
-            variant="ghost"
-            onClick={startNew}
-            className="h-auto px-4.5 py-1.5 rounded-lg border border-[#252A3A] cursor-pointer text-[13px] font-sans font-medium bg-transparent text-[#9CA3AF] transition-all duration-200 hover:border-[#06B6D455] hover:text-[#06B6D4] hover:bg-transparent"
-            title="Novo cliente"
-          >
-            <FilePlus2 className="size-4" />
-            Novo
-          </Button>
-          <Button
-            type="button"
-            variant="ghost"
-            onClick={handleSave}
-            disabled={saving}
-            className="h-auto px-4.5 py-1.5 rounded-lg border border-[#06B6D444] cursor-pointer text-[13px] font-sans font-medium bg-[#06B6D418] text-[#06B6D4] transition-all duration-200 hover:bg-[#06B6D433] hover:text-[#06B6D4] disabled:opacity-60"
-            title="Salvar cliente"
-          >
-            <Save className="size-4" />
-            {editingId ? 'Atualizar' : 'Salvar'}
-          </Button>
-        </div>
+          <div className="flex flex-wrap items-center gap-2">
+            <Button
+              type="button"
+              variant="ghost"
+              onClick={startNew}
+              className="h-auto px-4.5 py-1.5 rounded-lg border border-[#252A3A] cursor-pointer text-[13px] font-sans font-medium bg-transparent text-[#9CA3AF] transition-all duration-200 hover:border-[#06B6D455] hover:text-[#06B6D4] hover:bg-transparent"
+              title="Novo cliente"
+            >
+              <FilePlus2 className="size-4" />
+              Novo
+            </Button>
+            <Button
+              type="button"
+              variant="ghost"
+              onClick={handleSave}
+              disabled={saving}
+              className="h-auto px-4.5 py-1.5 rounded-lg border border-[#06B6D444] cursor-pointer text-[13px] font-sans font-medium bg-[#06B6D418] text-[#06B6D4] transition-all duration-200 hover:bg-[#06B6D433] hover:text-[#06B6D4] disabled:opacity-60"
+              title="Salvar cliente"
+            >
+              <Save className="size-4" />
+              {editingId ? 'Atualizar' : 'Salvar'}
+            </Button>
+          </div>
         </div>
       </header>
 
@@ -510,13 +510,13 @@ export default function Clientes({ onBack }: ClientesProps) {
               </div>
 
               <div className="flex flex-col gap-2 sm:flex-row sm:items-center">
-                <div className="relative flex-1">
+                <div className="relative w-full sm:w-[160px]">
                   <Search className="absolute left-3 top-1/2 -translate-y-1/2 size-4 text-[#6B7280]" />
                   <input
                     value={query}
                     onChange={(e) => setQuery(e.target.value)}
                     placeholder="Buscar..."
-                    className="h-[48px] w-full bg-[#191C25] border border-[#1E2130] rounded-lg pl-10 pr-3.5 text-[#E8EAF0] text-sm font-sans outline-none transition-all duration-200 placeholder:text-[#6B7280] placeholder:opacity-55 hover:border-[#252A3A] focus-visible:border-[#06B6D4] focus-visible:ring-[3px] focus-visible:ring-[#06B6D422] sm:w-[240px]"
+                    className="h-[35px] w-full bg-[#191C25] border border-[#1E2130] rounded-lg pl-10 pr-3.5 text-[#E8EAF0] text-sm font-sans outline-none transition-all duration-200 placeholder:text-[#6B7280] placeholder:opacity-55 hover:border-[#252A3A] focus-visible:border-[#06B6D4] focus-visible:ring-[3px] focus-visible:ring-[#06B6D422]"
                   />
                 </div>
 
@@ -524,7 +524,7 @@ export default function Clientes({ onBack }: ClientesProps) {
                   value={show}
                   onValueChange={(v) => setShow(v as 'ativos' | 'todos')}
                 >
-                  <SelectTrigger className="h-[48px] w-full bg-[#191C25] border-[#1E2130] text-[#E8EAF0] rounded-lg px-3.5 hover:bg-[#191C25] hover:text-[#E8EAF0] hover:border-[#252A3A] sm:w-[160px]">
+                  <SelectTrigger className=" w-full bg-[#191C25] border-[#1E2130] text-[#E8EAF0] rounded-lg px-3.5 hover:bg-[#191C25] hover:text-[#E8EAF0] hover:border-[#252A3A] sm:w-[160px]">
                     <SelectValue placeholder="Filtro" />
                   </SelectTrigger>
                   <SelectContent className="bg-[#13161D] border-[#1E2130] text-[#E8EAF0] rounded-xl shadow-[0_24px_64px_rgba(0,0,0,0.45)] overflow-hidden">
