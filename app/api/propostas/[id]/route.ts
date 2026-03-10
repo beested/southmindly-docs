@@ -1,38 +1,13 @@
 import { z } from 'zod';
 import { NextResponse } from 'next/server';
 
+import {
+  normalizePropostaStatus,
+  propostaEscopoSchema,
+  propostaPayloadSchema,
+  propostaComercialSchema,
+} from '@/lib/schemas/proposta-comercial';
 import { createSupabaseServerClient } from '@/lib/supabase/server';
-
-const propostaEscopoSchema = z.object({
-  escopoId: z.string().min(1),
-  periodicidade: z.string().optional().default(''),
-  valorNegociado: z.string().optional().default(''),
-  observacao: z.string().optional().default(''),
-  ordem: z.number().int().optional().default(0),
-});
-
-const propostaSchema = z.object({
-  numeroProposta: z.string().optional().default(''),
-  revisao: z.string().optional().default(''),
-  status: z.string().optional().default(''),
-  cidade: z.string().optional().default(''),
-  dataProposta: z.string().optional().default(''),
-  prazoContratoMeses: z.string().optional().default(''),
-  dataAceite: z.string().optional().default(''),
-  valorTotalMensal: z.string().optional().default(''),
-  observacoes: z.string().optional().default(''),
-
-  clienteId: z.string().optional().default(''),
-  assessorId: z.string().optional().default(''),
-
-  nomeResponsavelAssinatura: z.string().optional().default(''),
-
-  escopos: z.array(propostaEscopoSchema).optional().default([]),
-});
-
-const payloadSchema = z.object({
-  proposta: propostaSchema,
-});
 
 function formatISOToBR(value: string | null) {
   const v = (value ?? '').trim();
@@ -61,7 +36,7 @@ function parseDateBRToISO(value: string) {
   return `${yyyy}-${mm.padStart(2, '0')}-${dd.padStart(2, '0')}`;
 }
 
-function buildPropostaDbPayload(p: z.infer<typeof propostaSchema>) {
+function buildPropostaDbPayload(p: z.infer<typeof propostaComercialSchema>) {
   const allowedStatuses = new Set([
     'rascunho',
     'enviada',
@@ -274,7 +249,7 @@ export async function GET(
       numeroProposta:
         propostaRow.numero_proposta === null ? '' : String(propostaRow.numero_proposta),
       revisao: propostaRow.revisao === null ? '' : String(propostaRow.revisao),
-      status: propostaRow.status ?? '',
+      status: normalizePropostaStatus(propostaRow.status),
       cidade: propostaRow.cidade ?? '',
       dataProposta: formatISOToBR(propostaRow.data_proposta),
       prazoContratoMeses:
@@ -333,7 +308,7 @@ export async function PUT(
   const { id } = await params;
 
   const body = await request.json().catch(() => null);
-  const parsed = payloadSchema.safeParse(body);
+  const parsed = propostaPayloadSchema.safeParse(body);
 
   if (!parsed.success) {
     return NextResponse.json(

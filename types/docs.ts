@@ -1,5 +1,10 @@
 import type { LucideIcon } from 'lucide-react';
 
+import type {
+  PropostaComercial,
+  PropostaEscopo,
+} from '@/lib/schemas/proposta-comercial';
+
 export type DocType =
   | 'pauta-reuniao'
   | 'ata-reuniao'
@@ -37,33 +42,6 @@ export interface PautaData {
   itens: AgendaItem[];
 }
 
-export interface PropostaEscopoData {
-  escopoId: string;
-  nome: string;
-  descricao?: string;
-  tipoCobranca?: string;
-  unidadeLabel?: string;
-  periodicidade: string;
-  valorNegociado: string;
-  observacao: string;
-  ordem: number;
-}
+export type PropostaEscopoData = PropostaEscopo;
 
-export interface PropostaComercialData {
-  numeroProposta: string;
-  revisao: string;
-  status: string;
-  cidade: string;
-  dataProposta: string;
-  prazoContratoMeses: string;
-  dataAceite: string;
-  valorTotalMensal: string;
-  observacoes: string;
-
-  clienteId: string;
-  assessorId: string;
-
-  nomeResponsavelAssinatura: string;
-
-  escopos: PropostaEscopoData[];
-}
+export type PropostaComercialData = PropostaComercial;

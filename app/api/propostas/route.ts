@@ -1,38 +1,13 @@
 import { z } from 'zod';
 import { NextResponse } from 'next/server';
 
+import {
+  normalizePropostaStatus,
+  propostaEscopoSchema,
+  propostaPayloadSchema,
+  propostaComercialSchema,
+} from '@/lib/schemas/proposta-comercial';
 import { createSupabaseServerClient } from '@/lib/supabase/server';
-
-const propostaEscopoSchema = z.object({
-  escopoId: z.string().min(1),
-  periodicidade: z.string().optional().default(''),
-  valorNegociado: z.string().optional().default(''),
-  observacao: z.string().optional().default(''),
-  ordem: z.number().int().optional().default(0),
-});
-
-const propostaSchema = z.object({
-  numeroProposta: z.string().optional().default(''),
-  revisao: z.string().optional().default(''),
-  status: z.string().optional().default(''),
-  cidade: z.string().optional().default(''),
-  dataProposta: z.string().optional().default(''),
-  prazoContratoMeses: z.string().optional().default(''),
-  dataAceite: z.string().optional().default(''),
-  valorTotalMensal: z.string().optional().default(''),
-  observacoes: z.string().optional().default(''),
-
-  clienteId: z.string().optional().default(''),
-  assessorId: z.string().optional().default(''),
-
-  nomeResponsavelAssinatura: z.string().optional().default(''),
-
-  escopos: z.array(propostaEscopoSchema).optional().default([]),
-});
-
-const payloadSchema = z.object({
-  proposta: propostaSchema,
-});
 
 function parseNumber(value: string) {
   const normalized = (value ?? '')
@@ -53,7 +28,7 @@ function parseDateBRToISO(value: string) {
   return `${yyyy}-${mm.padStart(2, '0')}-${dd.padStart(2, '0')}`;
 }
 
-function buildPropostaDbPayload(p: z.infer<typeof propostaSchema>) {
+function buildPropostaDbPayload(p: z.infer<typeof propostaComercialSchema>) {
   const allowedStatuses = new Set([
     'rascunho',
     'enviada',
@@ -218,7 +193,7 @@ export async function GET() {
       id: row.id,
       numeroProposta: row.numero_proposta ?? null,
       revisao: row.revisao ?? null,
-      status: row.status ?? '',
+      status: normalizePropostaStatus(row.status),
       cidade: row.cidade ?? '',
       dataProposta: row.data_proposta ?? '',
       updatedAt: (row.atualizado_em ??
@@ -243,7 +218,7 @@ export async function POST(request: Request) {
   }
 
   const body = await request.json().catch(() => null);
-  const parsed = payloadSchema.safeParse(body);
+  const parsed = propostaPayloadSchema.safeParse(body);
 
   if (!parsed.success) {
     return NextResponse.json(
