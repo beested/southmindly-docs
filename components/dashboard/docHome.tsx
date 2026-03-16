@@ -12,18 +12,9 @@ import {
   type LucideIcon,
   Plus,
   RefreshCw,
-  Trash2,
   Users,
 } from 'lucide-react';
 import { useCallback, useEffect, useMemo, useState } from 'react';
-
-type PautaListItem = {
-  id: string;
-  docId: string;
-  titulo: string;
-  updatedAt: string;
-  createdAt: string;
-};
 
 type PropostaListItem = {
   id: string;
@@ -57,7 +48,7 @@ type EscopoCatalogItem = {
 
 type ActivityItem = {
   id: string;
-  kind: 'proposta' | 'pauta' | 'cliente';
+  kind: 'proposta' | 'cliente';
   title: string;
   subtitle: string;
   updatedAt: string;
@@ -65,7 +56,6 @@ type ActivityItem = {
 
 interface DocHomeProps {
   onSelectDoc: (doc: DocType) => void;
-  onOpenSavedPauta: (id: string) => void;
 }
 
 const statusLabels: Record<string, string> = {
@@ -214,11 +204,7 @@ function StatCard({
   );
 }
 
-export default function DocHome({
-  onSelectDoc,
-  onOpenSavedPauta,
-}: DocHomeProps) {
-  const [pautas, setPautas] = useState<PautaListItem[]>([]);
+export default function DocHome({ onSelectDoc }: DocHomeProps) {
   const [propostas, setPropostas] = useState<PropostaListItem[]>([]);
   const [clientes, setClientes] = useState<ClienteListItem[]>([]);
   const [escopos, setEscopos] = useState<EscopoCatalogItem[]>([]);
@@ -230,27 +216,17 @@ export default function DocHome({
     setDashboardError(null);
 
     try {
-      const [pautasRes, propostasRes, clientesRes, escoposRes] =
-        await Promise.all([
-          fetch('/api/pautas', { cache: 'no-store' }),
-          fetch('/api/propostas', { cache: 'no-store' }),
-          fetch('/api/clientes?all=1', { cache: 'no-store' }),
-          fetch('/api/escopos', { cache: 'no-store' }),
-        ]);
+      const [propostasRes, clientesRes, escoposRes] = await Promise.all([
+        fetch('/api/propostas', { cache: 'no-store' }),
+        fetch('/api/clientes?all=1', { cache: 'no-store' }),
+        fetch('/api/escopos', { cache: 'no-store' }),
+      ]);
 
-      const [pautasJson, propostasJson, clientesJson, escoposJson] =
-        await Promise.all([
-          pautasRes.json().catch(() => ({})),
-          propostasRes.json().catch(() => ({})),
-          clientesRes.json().catch(() => ({})),
-          escoposRes.json().catch(() => ({})),
-        ]);
-
-      if (!pautasRes.ok) {
-        throw new Error(
-          (pautasJson as { error?: string }).error ?? 'Erro ao carregar pautas',
-        );
-      }
+      const [propostasJson, clientesJson, escoposJson] = await Promise.all([
+        propostasRes.json().catch(() => ({})),
+        clientesRes.json().catch(() => ({})),
+        escoposRes.json().catch(() => ({})),
+      ]);
 
       if (!propostasRes.ok) {
         throw new Error(
@@ -273,11 +249,6 @@ export default function DocHome({
         );
       }
 
-      setPautas(
-        Array.isArray((pautasJson as { items?: PautaListItem[] }).items)
-          ? ((pautasJson as { items?: PautaListItem[] }).items ?? [])
-          : [],
-      );
       setPropostas(
         Array.isArray((propostasJson as { items?: PropostaListItem[] }).items)
           ? ((propostasJson as { items?: PropostaListItem[] }).items ?? [])
@@ -306,14 +277,6 @@ export default function DocHome({
     refreshDashboard();
   }, [refreshDashboard]);
 
-  const deletePauta = async (id: string) => {
-    if (!window.confirm('Excluir esta pauta?')) return;
-    const res = await fetch(`/api/pautas/${id}`, { method: 'DELETE' });
-    if (res.ok) {
-      refreshDashboard();
-    }
-  };
-
   const availableTemplates =
     DOC_DEFINITIONS.filter((doc) => doc.available).length +
     PEOPLE_DEFINITIONS.filter((doc) => doc.available).length;
@@ -329,20 +292,13 @@ export default function DocHome({
         return sourceDate ? getMonthKey(sourceDate) === monthKey : false;
       }).length;
 
-      const pautasCount = pautas.filter((pauta) => {
-        const sourceDate =
-          parseAnyDate(pauta.createdAt) ?? parseAnyDate(pauta.updatedAt);
-        return sourceDate ? getMonthKey(sourceDate) === monthKey : false;
-      }).length;
-
       return {
         monthKey,
         label: getMonthLabel(monthKey),
         propostas: propostasCount,
-        pautas: pautasCount,
       };
     });
-  }, [lastMonths, pautas, propostas]);
+  }, [lastMonths, propostas]);
 
   const statusStats = useMemo(() => {
     const base = Object.keys(statusLabels).map((key) => ({
@@ -394,14 +350,6 @@ export default function DocHome({
       updatedAt: proposta.updatedAt,
     }));
 
-    const pautaItems = pautas.map((pauta) => ({
-      id: pauta.id,
-      kind: 'pauta' as const,
-      title: pauta.titulo || 'Pauta sem título',
-      subtitle: pauta.docId,
-      updatedAt: pauta.updatedAt,
-    }));
-
     const clienteItems = clientes
       .filter((cliente) => cliente.createdAt)
       .map((cliente) => ({
@@ -415,18 +363,18 @@ export default function DocHome({
         updatedAt: cliente.createdAt,
       }));
 
-    return [...proposalItems, ...pautaItems, ...clienteItems]
+    return [...proposalItems, ...clienteItems]
       .sort((a, b) => {
         const aTime = parseAnyDate(a.updatedAt)?.getTime() ?? 0;
         const bTime = parseAnyDate(b.updatedAt)?.getTime() ?? 0;
         return bTime - aTime;
       })
       .slice(0, 8);
-  }, [clientes, pautas, propostas]);
+  }, [clientes, propostas]);
 
   const maxMonthlyValue = Math.max(
     1,
-    ...monthlyActivity.map((item) => Math.max(item.propostas, item.pautas)),
+    ...monthlyActivity.map((item) => item.propostas),
   );
   const maxCityValue = Math.max(1, ...cityStats.map((item) => item.value));
   const maxEscopoTypeValue = Math.max(
@@ -438,8 +386,8 @@ export default function DocHome({
   const stats = [
     {
       label: 'Documentos gerados',
-      value: String(propostas.length + pautas.length),
-      helper: `${propostas.length} propostas e ${pautas.length} pautas`,
+      value: String(propostas.length),
+      helper: 'Propostas comerciais registradas',
       icon: FileText,
       accent: '#4F7EFF',
     },
@@ -481,7 +429,7 @@ export default function DocHome({
               </h1>
               <p className="mt-4 max-w-[620px] text-[15px] leading-7 text-[#94A3B8]">
                 A dashboard agora usa dados reais do Supabase para acompanhar
-                propostas, pautas, clientes e escopos em um só lugar.
+                propostas, clientes e escopos em um só lugar.
               </p>
             </div>
 
@@ -528,7 +476,7 @@ export default function DocHome({
             title="Produção dos últimos 6 meses"
             action={
               <div className="rounded-full border border-[#1E2130] bg-[#0D0F14] px-3 py-1 text-[11px] font-mono uppercase tracking-[0.12em] text-[#8B93A7]">
-                Propostas x Pautas
+                Propostas
               </div>
             }
           >
@@ -551,17 +499,6 @@ export default function DocHome({
                           }}
                         />
                       </div>
-                      <div className="flex w-full max-w-[34px] flex-col items-center gap-2">
-                        <div className="text-[10px] font-mono text-[#6B7280]">
-                          {item.pautas}
-                        </div>
-                        <div
-                          className="w-full rounded-t-[10px] bg-[#34D399]"
-                          style={{
-                            height: `${(item.pautas / maxMonthlyValue) * 150 + 12}px`,
-                          }}
-                        />
-                      </div>
                     </div>
                     <div className="text-[11px] font-mono uppercase tracking-[0.12em] text-[#8B93A7]">
                       {item.label}
@@ -575,10 +512,6 @@ export default function DocHome({
               <div className="flex items-center gap-2">
                 <span className="size-2.5 rounded-full bg-[#4F7EFF]" />
                 Propostas
-              </div>
-              <div className="flex items-center gap-2">
-                <span className="size-2.5 rounded-full bg-[#34D399]" />
-                Pautas
               </div>
             </div>
           </ChartCard>
@@ -694,8 +627,6 @@ export default function DocHome({
                     <div className="mt-0.5 flex size-10 items-center justify-center rounded-2xl border border-[#252A3A] bg-[#13161D]">
                       {item.kind === 'proposta' ? (
                         <FileBadge2 className="size-4 text-[#4F7EFF]" />
-                      ) : item.kind === 'pauta' ? (
-                        <FileText className="size-4 text-[#34D399]" />
                       ) : (
                         <Users className="size-4 text-[#F59E0B]" />
                       )}
@@ -915,88 +846,6 @@ export default function DocHome({
             </div>
           </div>
         )}
-
-        <div className="mt-12">
-          <div className="mb-5 flex items-center gap-3 text-[11px] font-mono uppercase tracking-[0.15em] text-[#4B5563]">
-            Meus documentos
-            <div className="h-px flex-1 bg-[#1E2130]" />
-          </div>
-
-          <div className="overflow-hidden rounded-[24px] border border-[#1E2130] bg-[#13161D]">
-            <div className="flex items-center justify-between border-b border-[#1E2130] px-6 py-4">
-              <div>
-                <div className="text-xs font-mono uppercase tracking-[0.14em] text-[#6B7280]">
-                  Pautas de reunião
-                </div>
-                <div className="text-sm font-medium text-[#E8EAF0]">
-                  {loadingDashboard
-                    ? 'Carregando...'
-                    : `${pautas.length} item(ns)`}
-                </div>
-              </div>
-              <div className="flex items-center gap-2">
-                <Button
-                  type="button"
-                  variant="ghost"
-                  onClick={refreshDashboard}
-                  className="h-9 rounded-lg border border-[#252A3A] bg-transparent px-3 text-[12px] text-[#9CA3AF] hover:border-[#4F7EFF44] hover:text-[#4F7EFF] hover:bg-transparent"
-                  title="Atualizar lista"
-                >
-                  <RefreshCw
-                    className={`size-4 ${loadingDashboard ? 'animate-spin' : ''}`}
-                  />
-                  Atualizar
-                </Button>
-                <Button
-                  type="button"
-                  variant="ghost"
-                  onClick={() => onSelectDoc('pauta-reuniao')}
-                  className="h-9 rounded-lg bg-[#4F7EFF] px-4 text-[12px] text-white hover:bg-[#4F7EFF] hover:text-white"
-                  title="Criar nova pauta"
-                >
-                  <Plus className="size-4" />
-                  Nova pauta
-                </Button>
-              </div>
-            </div>
-
-            <div className="max-h-[50vh] divide-y divide-[#1E2130] overflow-auto">
-              {!loadingDashboard && pautas.length === 0 && !dashboardError && (
-                <div className="p-6 text-sm text-[#6B7280]">
-                  Nenhuma pauta salva ainda.
-                </div>
-              )}
-
-              {pautas.map((pauta) => (
-                <div key={pauta.id} className="flex items-center gap-3 p-5">
-                  <Button
-                    type="button"
-                    variant="ghost"
-                    onClick={() => onOpenSavedPauta(pauta.id)}
-                    className="h-auto flex-1 justify-start px-0 py-0 text-left hover:bg-transparent"
-                  >
-                    <div className="text-sm font-medium text-[#E8EAF0] truncate">
-                      {pauta.titulo || 'Sem título'}
-                    </div>
-                    <div className="mt-1 text-[11px] font-mono text-[#6B7280]">
-                      {pauta.docId} · atualizado{' '}
-                      {new Date(pauta.updatedAt).toLocaleString('pt-BR')}
-                    </div>
-                  </Button>
-                  <Button
-                    type="button"
-                    variant="destructive"
-                    onClick={() => deletePauta(pauta.id)}
-                    title="Excluir"
-                  >
-                    <Trash2 className="size-4" />
-                    Excluir
-                  </Button>
-                </div>
-              ))}
-            </div>
-          </div>
-        </div>
       </div>
     </div>
   );

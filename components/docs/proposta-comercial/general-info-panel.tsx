@@ -1,16 +1,18 @@
 'use client';
 
-import { DatePicker } from '@/components/ui/date-picker';
+import { DatePicker } from '@/components/ui/inputs/date-picker';
+import {
+  Field,
+  SelectField,
+  TextAreaField,
+} from '@/components/ui/inputs';
 import { PropostaComercialData } from '@/types/docs';
-
-import { Field, SelectField, TextAreaField } from './form-fields';
-import { AssessorItem, ClienteItem, SelectOption } from './types';
+import { ClienteItem, SelectOption } from './types';
 
 interface GeneralInfoPanelProps {
   data: PropostaComercialData;
   onChange: (patch: Partial<PropostaComercialData>) => void;
   clientes: ClienteItem[];
-  assessores: AssessorItem[];
   statusOptions: SelectOption<PropostaComercialData['status']>[];
 }
 
@@ -18,17 +20,11 @@ export function GeneralInfoPanel({
   data,
   onChange,
   clientes,
-  assessores,
   statusOptions,
 }: GeneralInfoPanelProps) {
-  const selectedAssessorIds = data.assessorId
-    .split(',')
-    .map((value) => value.trim())
-    .filter(Boolean);
-
   return (
     <div className="overflow-y-auto border-b border-[#1E2130] bg-[#13161D] p-4 sm:p-5 lg:border-b-0 lg:border-r lg:p-[28px_24px]">
-      <div className="text-[10px] font-mono text-[#34D399] tracking-[0.15em] uppercase mb-5 pb-3.5 border-b border-[#1E2130]">
+      <div className="text-[10px] font-mono text-[#7C3AED] tracking-[0.15em] uppercase mb-5 pb-3.5 border-b border-[#1E2130]">
         Informações gerais
       </div>
 
@@ -95,7 +91,7 @@ export function GeneralInfoPanel({
             value={data.dataProposta}
             onChange={(dataProposta) => onChange({ dataProposta })}
             placeholder="dd/mm/aaaa"
-            accentColor="#34D399"
+            accentColor="#7C3AED"
           />
         </div>
         <Field
@@ -115,7 +111,7 @@ export function GeneralInfoPanel({
             value={data.dataAceite}
             onChange={(dataAceite) => onChange({ dataAceite })}
             placeholder="dd/mm/aaaa"
-            accentColor="#34D399"
+            accentColor="#7C3AED"
           />
         </div>
         <Field

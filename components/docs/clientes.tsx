@@ -1,24 +1,23 @@
 ﻿'use client';
 
 import { Button } from '@/components/ui/button';
+import { Field, ToggleField } from '@/components/ui/inputs';
+import { PhoneInput } from '@/components/ui/inputs/phone-input';
 import {
   Select,
   SelectContent,
   SelectItem,
   SelectTrigger,
   SelectValue,
-} from '@/components/ui/select';
+} from '@/components/ui/inputs/select';
 import {
   Building2,
   Edit,
   FilePlus2,
   ImageUp,
-  Mail,
-  Phone,
   Save,
   Search,
   Trash2,
-  User,
   X,
 } from 'lucide-react';
 import { useCallback, useEffect, useMemo, useState } from 'react';
@@ -61,91 +60,6 @@ const emptyForm: ClienteForm = {
   cidade: '',
   ativo: true,
 };
-
-function Field({
-  label,
-  value,
-  onChange,
-  placeholder,
-  icon,
-}: {
-  label: string;
-  value: string;
-  onChange: (v: string) => void;
-  placeholder?: string;
-  icon?: React.ReactNode;
-}) {
-  const [focused, setFocused] = useState(false);
-  return (
-    <div className="mb-4">
-      <label
-        className={`block text-[10px] font-mono tracking-[0.12em] uppercase mb-1.5 transition-colors duration-200 ${focused ? 'text-[#06B6D4]' : 'text-[#6B7280]'}`}
-      >
-        {label}
-      </label>
-      <div className="relative">
-        {icon && (
-          <div className="absolute left-3 top-1/2 -translate-y-1/2 text-[#6B7280]">
-            {icon}
-          </div>
-        )}
-        <input
-          value={value}
-          onChange={(e) => onChange(e.target.value)}
-          placeholder={placeholder}
-          onFocus={() => setFocused(true)}
-          onBlur={() => setFocused(false)}
-          className={`w-full h-[48px] bg-[#191C25] border rounded-lg ${
-            icon ? 'pl-10' : 'pl-3.5'
-          } pr-3.5 py-2.5 text-[#E8EAF0] text-sm font-sans outline-none transition-all duration-200 placeholder:text-[#6B7280] placeholder:opacity-55 hover:border-[#252A3A] ${focused ? 'border-[#06B6D4] ring-[3px] ring-[#06B6D422]' : 'border-[#1E2130]'}`}
-        />
-      </div>
-    </div>
-  );
-}
-
-function Toggle({
-  label,
-  value,
-  onChange,
-}: {
-  label: string;
-  value: boolean;
-  onChange: (v: boolean) => void;
-}) {
-  return (
-    <div className="mb-4">
-      <div className="text-[10px] font-mono tracking-[0.12em] uppercase mb-1.5 text-[#6B7280]">
-        {label}
-      </div>
-      <button
-        type="button"
-        onClick={() => onChange(!value)}
-        className={`w-full h-[48px] rounded-lg border px-3.5 flex items-center justify-between transition-all duration-200 ${
-          value
-            ? 'bg-[#06B6D418] border-[#06B6D444] text-[#06B6D4]'
-            : 'bg-[#191C25] border-[#1E2130] text-[#6B7280]'
-        } hover:border-[#252A3A]`}
-        aria-pressed={value}
-      >
-        <span className="text-sm font-medium font-sans">
-          {value ? 'Ativo' : 'Inativo'}
-        </span>
-        <span
-          className={`w-10 h-6 rounded-full border flex items-center px-1 transition-colors duration-200 ${
-            value ? 'bg-[#06B6D422] border-[#06B6D455]' : 'border-[#252A3A]'
-          }`}
-        >
-          <span
-            className={`h-4 w-4 rounded-full transition-transform duration-200 ${
-              value ? 'bg-[#06B6D4] translate-x-4' : 'bg-[#6B7280]'
-            }`}
-          />
-        </span>
-      </button>
-    </div>
-  );
-}
 
 export default function Clientes({ onBack }: ClientesProps) {
   const [clientes, setClientes] = useState<Cliente[]>([]);
@@ -342,7 +256,7 @@ export default function Clientes({ onBack }: ClientesProps) {
               type="button"
               variant="ghost"
               onClick={startNew}
-              className="h-auto px-4.5 py-1.5 rounded-lg border border-[#252A3A] cursor-pointer text-[13px] font-sans font-medium bg-transparent text-[#9CA3AF] transition-all duration-200 hover:border-[#06B6D455] hover:text-[#06B6D4] hover:bg-transparent"
+              className="h-auto px-4.5 py-1.5 rounded-lg border border-[#252A3A] cursor-pointer bg-transparent text-[13px] font-sans font-medium text-[#9CA3AF] transition-all duration-200 hover:border-[#A78BFA55] hover:bg-transparent hover:text-[#A78BFA]"
               title="Novo cliente"
             >
               <FilePlus2 className="size-4" />
@@ -353,7 +267,7 @@ export default function Clientes({ onBack }: ClientesProps) {
               variant="ghost"
               onClick={handleSave}
               disabled={saving}
-              className="h-auto px-4.5 py-1.5 rounded-lg border border-[#06B6D444] cursor-pointer text-[13px] font-sans font-medium bg-[#06B6D418] text-[#06B6D4] transition-all duration-200 hover:bg-[#06B6D433] hover:text-[#06B6D4] disabled:opacity-60"
+              className="h-auto px-4.5 py-1.5 rounded-lg border border-[#A78BFA44] cursor-pointer bg-[#A78BFA18] text-[13px] font-sans font-medium text-[#A78BFA] transition-all duration-200 hover:bg-[#A78BFA33] hover:text-[#A78BFA] disabled:opacity-60"
               title="Salvar cliente"
             >
               <Save className="size-4" />
@@ -372,7 +286,7 @@ export default function Clientes({ onBack }: ClientesProps) {
       <div className="flex-1 overflow-auto">
         <div className="grid min-h-[calc(100vh-60px)] grid-cols-1 lg:grid-cols-[360px_1fr]">
           <div className="border-b border-[#1E2130] bg-[#13161D] p-4 overflow-y-auto sm:p-5 lg:border-b-0 lg:border-r lg:p-[28px_24px]">
-            <div className="text-[10px] font-mono text-[#06B6D4] tracking-[0.15em] uppercase mb-5 pb-3.5 border-b border-[#1E2130]">
+            <div className="text-[10px] font-mono text-[#A78BFA] tracking-[0.15em] uppercase mb-5 pb-3.5 border-b border-[#1E2130]">
               Dados do cliente
             </div>
 
@@ -381,7 +295,6 @@ export default function Clientes({ onBack }: ClientesProps) {
               value={form.razaoSocial}
               onChange={(v) => setForm((f) => ({ ...f, razaoSocial: v }))}
               placeholder="Ex: SouthMindly LTDA"
-              icon={<Building2 className="size-4" />}
             />
 
             <div className="grid grid-cols-1 gap-2.5 sm:grid-cols-2">
@@ -391,14 +304,18 @@ export default function Clientes({ onBack }: ClientesProps) {
                 onChange={(v) => setForm((f) => ({ ...f, cidade: v }))}
                 placeholder="Ex: São Paulo"
               />
-              <Toggle
+              <ToggleField
                 label="Status"
-                value={form.ativo}
-                onChange={(v) => setForm((f) => ({ ...f, ativo: v }))}
+                checked={form.ativo}
+                onCheckedChange={(checked) =>
+                  setForm((f) => ({ ...f, ativo: checked }))
+                }
+                checkedLabel="Ativo"
+                uncheckedLabel="Inativo"
               />
             </div>
 
-            <div className="text-[10px] font-mono text-[#06B6D4] tracking-[0.15em] uppercase mb-4 mt-6 pt-5 border-t border-[#1E2130]">
+            <div className="text-[10px] font-mono text-[#A78BFA] tracking-[0.15em] uppercase mb-4 mt-6 pt-5 border-t border-[#1E2130]">
               Contato
             </div>
 
@@ -407,7 +324,6 @@ export default function Clientes({ onBack }: ClientesProps) {
               value={form.nomeContato}
               onChange={(v) => setForm((f) => ({ ...f, nomeContato: v }))}
               placeholder="Ex: Felipe Susin"
-              icon={<User className="size-4" />}
             />
             <Field
               label="Cargo"
@@ -420,20 +336,21 @@ export default function Clientes({ onBack }: ClientesProps) {
               value={form.emailContato}
               onChange={(v) => setForm((f) => ({ ...f, emailContato: v }))}
               placeholder="Ex: contato@empresa.com"
-              icon={<Mail className="size-4" />}
+              type="email"
             />
             <Field
               label="Telefone"
               value={form.telefoneContato}
               onChange={(v) => setForm((f) => ({ ...f, telefoneContato: v }))}
               placeholder="Ex: (11) 99999-9999"
-              icon={<Phone className="size-4" />}
+              renderInput={(inputProps) => <PhoneInput {...inputProps} />}
             />
             <Field
               label="Logo URL"
               value={form.logoUrl}
               onChange={(v) => setLogoUrl(v)}
               placeholder="https://... (ou selecione um arquivo abaixo)"
+              type="url"
             />
 
             <div className="mb-4">
@@ -501,7 +418,7 @@ export default function Clientes({ onBack }: ClientesProps) {
           <div className="overflow-y-auto p-4 sm:p-5 lg:p-[28px_32px]">
             <div className="mb-5 flex flex-col gap-4 border-b border-[#1E2130] pb-3.5 xl:flex-row xl:items-center xl:justify-between">
               <div>
-                <div className="text-[10px] font-mono text-[#06B6D4] tracking-[0.15em] uppercase">
+                <div className="text-[10px] font-mono text-[#A78BFA] tracking-[0.15em] uppercase">
                   Lista
                 </div>
                 <div className="text-[13px] font-sans text-[#E8EAF0] font-medium mt-1">
@@ -516,7 +433,7 @@ export default function Clientes({ onBack }: ClientesProps) {
                     value={query}
                     onChange={(e) => setQuery(e.target.value)}
                     placeholder="Buscar..."
-                    className="h-[35px] w-full bg-[#191C25] border border-[#1E2130] rounded-lg pl-10 pr-3.5 text-[#E8EAF0] text-sm font-sans outline-none transition-all duration-200 placeholder:text-[#6B7280] placeholder:opacity-55 hover:border-[#252A3A] focus-visible:border-[#06B6D4] focus-visible:ring-[3px] focus-visible:ring-[#06B6D422]"
+                    className="h-[35px] w-full bg-[#191C25] border border-[#1E2130] rounded-lg pl-10 pr-3.5 text-[#E8EAF0] text-sm font-sans outline-none transition-all duration-200 placeholder:text-[#6B7280] placeholder:opacity-55 hover:border-[#252A3A] focus-visible:border-[#A78BFA] focus-visible:ring-[3px] focus-visible:ring-[#A78BFA22]"
                   />
                 </div>
 

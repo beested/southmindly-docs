@@ -17,7 +17,6 @@ import { PropostaHeader } from './header';
 import { PropostaPreview } from './preview';
 import { PropostasModal } from './propostas-modal';
 import {
-  AssessorItem,
   ClienteItem,
   EscopoCatalogItem,
   PropostaComercialProps,
@@ -40,7 +39,6 @@ export default function PropostaComercial({ onBack }: PropostaComercialProps) {
   );
   const [activeTab, setActiveTab] = useState<'editor' | 'preview'>('editor');
   const [clientes, setClientes] = useState<ClienteItem[]>([]);
-  const [assessores, setAssessores] = useState<AssessorItem[]>([]);
   const [escoposCatalogo, setEscoposCatalogo] = useState<EscopoCatalogItem[]>(
     [],
   );
@@ -62,14 +60,6 @@ export default function PropostaComercial({ onBack }: PropostaComercialProps) {
     setClientes(Array.isArray(json.items) ? json.items : []);
   }, []);
 
-  const refreshAssessores = useCallback(async () => {
-    const res = await fetch('/api/assessores', { cache: 'no-store' });
-    const json = (await res.json().catch(() => ({}))) as {
-      items?: AssessorItem[];
-    };
-    setAssessores(Array.isArray(json.items) ? json.items : []);
-  }, []);
-
   const refreshList = useCallback(async () => {
     const res = await fetch('/api/propostas', { cache: 'no-store' });
     const json = (await res.json().catch(() => ({}))) as {
@@ -88,9 +78,8 @@ export default function PropostaComercial({ onBack }: PropostaComercialProps) {
 
   useEffect(() => {
     refreshClientes();
-    refreshAssessores();
     refreshEscoposCatalogo();
-  }, [refreshClientes, refreshAssessores, refreshEscoposCatalogo]);
+  }, [refreshClientes, refreshEscoposCatalogo]);
 
   const updateData = useCallback((patch: Partial<PropostaComercialData>) => {
     setData((current) => ({ ...current, ...patch }));
@@ -359,7 +348,6 @@ export default function PropostaComercial({ onBack }: PropostaComercialProps) {
               data={data}
               onChange={updateData}
               clientes={clientes}
-              assessores={assessores}
               statusOptions={statusOptions}
             />
             <EscoposEditor

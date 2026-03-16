@@ -31,7 +31,7 @@ export function EscoposEditor({
   return (
     <div className="overflow-y-auto p-4 sm:p-5 lg:p-[28px_32px]">
       <div className="flex justify-between items-center mb-5 pb-3.5 border-b border-[#1E2130]">
-        <div className="text-[10px] font-mono text-[#34D399] tracking-[0.15em] uppercase">
+        <div className="text-[10px] font-mono text-[#A78BFA] tracking-[0.15em] uppercase">
           Escopos
         </div>
         <span className="text-[11px] font-mono text-[#6B7280]">
@@ -58,7 +58,7 @@ export function EscoposEditor({
         >
           <div className="flex items-start justify-between gap-3">
             <div className="flex items-start gap-3">
-              <div className="min-w-[28px] h-7 rounded-full bg-gradient-to-br from-[#34D399] to-[#4F7EFF] flex items-center justify-center text-[11px] font-bold text-white font-mono shrink-0 mt-0.5">
+              <div className="min-w-[28px] h-7 rounded-full bg-gradient-to-br from-[#A78BFA] to-[#7C3AED] flex items-center justify-center text-[11px] font-bold text-white font-mono shrink-0 mt-0.5">
                 {String(index + 1).padStart(2, '0')}
               </div>
               <div className="flex-1 min-w-0">
@@ -121,7 +121,7 @@ export function EscoposEditor({
                   onUpdate(index, { periodicidade: e.target.value })
                 }
                 placeholder="mensal"
-                className="w-full h-[48px] bg-[#0D0F1488] border border-[#1E2130] rounded-md px-2.5 py-2 text-[#9CA3AF] text-xs font-mono outline-none transition-all duration-200 placeholder:text-[#6B7280] placeholder:opacity-55 hover:border-[#252A3A] focus-visible:border-[#34D399] focus-visible:ring-[3px] focus-visible:ring-[#34D39922]"
+                className="w-full h-[48px] bg-[#0D0F1488] border border-[#1E2130] rounded-md px-2.5 py-2 text-[#9CA3AF] text-xs font-mono outline-none transition-all duration-200 placeholder:text-[#6B7280] placeholder:opacity-55 hover:border-[#252A3A] focus-visible:border-[#A78BFA] focus-visible:ring-[3px] focus-visible:ring-[#A78BFA22]"
               />
             </div>
             <div>
@@ -134,7 +134,7 @@ export function EscoposEditor({
                   onUpdate(index, { valorNegociado: e.target.value })
                 }
                 placeholder="Ex: 2500"
-                className="w-full h-[48px] bg-[#0D0F1488] border border-[#1E2130] rounded-md px-2.5 py-2 text-[#9CA3AF] text-xs font-mono outline-none transition-all duration-200 placeholder:text-[#6B7280] placeholder:opacity-55 hover:border-[#252A3A] focus-visible:border-[#34D399] focus-visible:ring-[3px] focus-visible:ring-[#34D39922]"
+                className="w-full h-[48px] bg-[#0D0F1488] border border-[#1E2130] rounded-md px-2.5 py-2 text-[#9CA3AF] text-xs font-mono outline-none transition-all duration-200 placeholder:text-[#6B7280] placeholder:opacity-55 hover:border-[#252A3A] focus-visible:border-[#A78BFA] focus-visible:ring-[3px] focus-visible:ring-[#A78BFA22]"
               />
             </div>
           </div>
@@ -158,7 +158,7 @@ export function EscoposEditor({
         type="button"
         variant="ghost"
         onClick={onOpenCatalog}
-        className="h-auto w-full p-3.5 bg-[#34D39918] border border-dashed border-[#34D39944] rounded-xl text-[#34D399] text-[13px] font-sans font-medium cursor-pointer transition-colors duration-200 mt-1 hover:bg-[#34D39933] hover:text-[#34D399]"
+        className="h-auto w-full p-3.5 bg-[#A78BFA18] border border-dashed border-[#A78BFA44] rounded-xl text-[#A78BFA] text-[13px] font-sans font-medium cursor-pointer transition-colors duration-200 mt-1 hover:bg-[#A78BFA33] hover:text-[#A78BFA]"
       >
         <Plus className="size-4" />
         Adicionar escopo

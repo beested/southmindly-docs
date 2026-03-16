@@ -40,7 +40,7 @@ function DatePicker({
   onChange,
   placeholder = 'Selecione a data',
   className,
-  accentColor = '#4F7EFF',
+  accentColor = '#7C3AED',
   popoverClassName,
 }: DatePickerProps) {
   const selectedDate = React.useMemo(() => parseInputDate(value), [value]);

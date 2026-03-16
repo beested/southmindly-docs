@@ -50,6 +50,16 @@
 
 :root {
   --radius: 0.625rem;
+  --sm-accent: #7c3aed;
+  --sm-accent-10: #7c3aed10;
+  --sm-accent-14: #7c3aed14;
+  --sm-accent-18: #7c3aed18;
+  --sm-accent-22: #7c3aed22;
+  --sm-accent-30: #7c3aed30;
+  --sm-accent-33: #7c3aed33;
+  --sm-accent-40: #7c3aed40;
+  --sm-accent-44: #7c3aed44;
+  --sm-accent-55: #7c3aed55;
   --background: oklch(1 0 0);
   --foreground: oklch(0.129 0.042 264.695);
   --card: oklch(1 0 0);
@@ -149,7 +159,7 @@
   }
 
   .sm-textarea-scrollbar::-webkit-scrollbar-thumb:hover {
-    background: #4f7eff;
+    background: var(--sm-accent);
     border: 2px solid transparent;
     background-clip: content-box;
   }

@@ -157,9 +157,9 @@ export default function Sidebar({
               key={item.id}
               onClick={() => item.available && onSelectDoc(item.id)}
               title={!open ? item.label : undefined}
-              className={`mb-0.5 flex w-full rounded-[10px] border transition-all duration-[180ms] ease-out hover:bg-[#1E2130] ${
+              className={`mb-0.5 flex w-full rounded-[10px] border transition-all duration-[180ms] ease-out hover:border-[#7C3AED33] hover:bg-[#7C3AED14] ${
                 isActive
-                  ? 'bg-[#1a2340] border-[#4F7EFF44]'
+                  ? 'bg-[#7C3AED18] border-[#7C3AED44]'
                   : 'bg-transparent border-transparent'
               } ${
                 item.available
@@ -246,9 +246,9 @@ export default function Sidebar({
                   key={item.id}
                   onClick={() => item.available && onSelectDoc(item.id)}
                   title={!open ? item.label : undefined}
-                  className={`mb-0.5 flex w-full rounded-[10px] border transition-all duration-[180ms] ease-out hover:bg-[#1E2130] ${
+                  className={`mb-0.5 flex w-full rounded-[10px] border transition-all duration-[180ms] ease-out hover:border-[#7C3AED33] hover:bg-[#7C3AED14] ${
                     isActive
-                      ? 'bg-[#1a2340] border-[#4F7EFF44]'
+                      ? 'bg-[#7C3AED18] border-[#7C3AED44]'
                       : 'bg-transparent border-transparent'
                   } ${
                     item.available

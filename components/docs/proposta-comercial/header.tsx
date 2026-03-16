@@ -73,7 +73,7 @@ export function PropostaHeader({
             type="button"
             variant="ghost"
             onClick={onNew}
-            className="h-auto rounded-lg border border-[#252A3A] bg-transparent px-3 py-1.5 text-[12px] font-medium text-[#9CA3AF] transition-all duration-200 hover:border-[#34D39955] hover:bg-transparent hover:text-[#34D399] sm:px-4.5 sm:text-[13px]"
+            className="h-auto rounded-lg border border-[#252A3A] bg-transparent px-3 py-1.5 text-[12px] font-medium text-[#9CA3AF] transition-all duration-200 hover:border-[#7C3AED55] hover:bg-transparent hover:text-[#7C3AED] sm:px-4.5 sm:text-[13px]"
             title="Novo documento"
           >
             <FilePlus2 className="size-4" />
@@ -83,7 +83,7 @@ export function PropostaHeader({
             type="button"
             variant="ghost"
             onClick={onOpenList}
-            className="h-auto rounded-lg border border-[#252A3A] bg-transparent px-3 py-1.5 text-[12px] font-medium text-[#9CA3AF] transition-all duration-200 hover:border-[#34D39944] hover:bg-transparent hover:text-[#34D399] sm:px-4.5 sm:text-[13px]"
+            className="h-auto rounded-lg border border-[#252A3A] bg-transparent px-3 py-1.5 text-[12px] font-medium text-[#9CA3AF] transition-all duration-200 hover:border-[#7C3AED44] hover:bg-transparent hover:text-[#7C3AED] sm:px-4.5 sm:text-[13px]"
             title="Consultar propostas salvas"
           >
             <FolderOpen className="size-4" />
@@ -93,7 +93,7 @@ export function PropostaHeader({
             type="button"
             variant="ghost"
             onClick={onSetEditor}
-            className={`h-auto rounded-lg border-none px-3 py-1.5 text-[12px] font-medium transition-all duration-200 hover:bg-transparent sm:px-4 sm:text-[13px] ${activeTab === 'editor' ? 'bg-[#34D399] text-[#0B0D12] hover:bg-[#34D399] hover:text-[#0B0D12]' : 'bg-transparent text-[#6B7280]'}`}
+            className={`h-auto rounded-lg border-none px-3 py-1.5 text-[12px] font-medium transition-all duration-200 hover:bg-transparent sm:px-4 sm:text-[13px] ${activeTab === 'editor' ? 'bg-[#7C3AED] text-white hover:bg-[#7C3AED] hover:text-white' : 'bg-transparent text-[#6B7280]'}`}
           >
             <Pencil className="size-4" />
             Editor
@@ -102,7 +102,7 @@ export function PropostaHeader({
             type="button"
             variant="ghost"
             onClick={onSetPreview}
-            className={`h-auto rounded-lg border-none px-3 py-1.5 text-[12px] font-medium transition-all duration-200 hover:bg-transparent sm:px-4 sm:text-[13px] ${activeTab === 'preview' ? 'bg-[#34D399] text-[#0B0D12] hover:bg-[#34D399] hover:text-[#0B0D12]' : 'bg-transparent text-[#6B7280]'}`}
+            className={`h-auto rounded-lg border-none px-3 py-1.5 text-[12px] font-medium transition-all duration-200 hover:bg-transparent sm:px-4 sm:text-[13px] ${activeTab === 'preview' ? 'bg-[#7C3AED] text-white hover:bg-[#7C3AED] hover:text-white' : 'bg-transparent text-[#6B7280]'}`}
           >
             <Eye className="size-4" />
             Preview
@@ -113,7 +113,7 @@ export function PropostaHeader({
             variant="ghost"
             onClick={onSave}
             disabled={saving}
-            className="h-auto rounded-lg border border-[#34D39944] bg-[#34D39918] px-3 py-1.5 text-[12px] font-medium text-[#34D399] transition-all duration-200 hover:bg-[#34D39933] hover:text-[#34D399] disabled:opacity-60 sm:px-4.5 sm:text-[13px]"
+            className="h-auto rounded-lg border border-[#7C3AED44] bg-[#7C3AED18] px-3 py-1.5 text-[12px] font-medium text-[#7C3AED] transition-all duration-200 hover:bg-[#7C3AED33] hover:text-[#7C3AED] disabled:opacity-60 sm:px-4.5 sm:text-[13px]"
             title="Salvar no Supabase"
           >
             <Save className="size-4" />
@@ -123,7 +123,7 @@ export function PropostaHeader({
             type="button"
             variant="ghost"
             onClick={onPrint}
-            className="h-auto rounded-lg border border-[#252A3A] bg-transparent px-3 py-1.5 text-[12px] font-medium text-[#9CA3AF] transition-all duration-200 hover:border-[#34D399] hover:bg-transparent hover:text-[#34D399] sm:px-4.5 sm:text-[13px]"
+            className="h-auto rounded-lg border border-[#252A3A] bg-transparent px-3 py-1.5 text-[12px] font-medium text-[#9CA3AF] transition-all duration-200 hover:border-[#7C3AED] hover:bg-transparent hover:text-[#7C3AED] sm:px-4.5 sm:text-[13px]"
             title="Abrir impressão do navegador"
           >
             <Printer className="size-4" />

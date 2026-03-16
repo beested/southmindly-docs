@@ -12,15 +12,18 @@ export type DocDefinition = DocMenuItem & {
   hasSavedList: boolean;
 };
 
+const SOUTHMINDLY_PURPLE = '#7C3AED';
+
 export const DOC_DEFINITIONS: DocDefinition[] = [
   {
     id: 'pauta-reuniao',
     label: 'Pauta de Reunião',
     description: 'Estruture pontos, responsáveis e horários',
     icon: ClipboardList,
-    available: true,
-    color: '#4F7EFF',
-    hasSavedList: true,
+    available: false,
+    badge: 'Em breve',
+    color: SOUTHMINDLY_PURPLE,
+    hasSavedList: false,
   },
   {
     id: 'ata-reuniao',
@@ -29,7 +32,7 @@ export const DOC_DEFINITIONS: DocDefinition[] = [
     icon: FileText,
     available: false,
     badge: 'Em breve',
-    color: '#A78BFA',
+    color: SOUTHMINDLY_PURPLE,
     hasSavedList: false,
   },
   {
@@ -38,7 +41,7 @@ export const DOC_DEFINITIONS: DocDefinition[] = [
     description: 'Crie propostas profissionais para clientes',
     icon: BriefcaseBusiness,
     available: true,
-    color: '#34D399',
+    color: SOUTHMINDLY_PURPLE,
     hasSavedList: true,
   },
   {
@@ -48,7 +51,7 @@ export const DOC_DEFINITIONS: DocDefinition[] = [
     icon: Scale,
     available: false,
     badge: 'Em breve',
-    color: '#F59E0B',
+    color: SOUTHMINDLY_PURPLE,
     hasSavedList: false,
   },
   {
@@ -58,7 +61,7 @@ export const DOC_DEFINITIONS: DocDefinition[] = [
     icon: ScrollText,
     available: false,
     badge: 'Em breve',
-    color: '#F87171',
+    color: SOUTHMINDLY_PURPLE,
     hasSavedList: false,
   },
 ];
@@ -70,7 +73,7 @@ export const PEOPLE_DEFINITIONS: DocDefinition[] = [
     description: 'Cadastre e gerencie seus clientes',
     icon: Users,
     available: true,
-    color: '#06B6D4',
+    color: SOUTHMINDLY_PURPLE,
     hasSavedList: false,
   },
 ];

@@ -6,7 +6,6 @@ import Sidebar, {
   DESKTOP_SIDEBAR_OPEN_WIDTH,
 } from '@/components/dashboard/sidebar';
 import Clientes from '@/components/docs/clientes';
-import PautaReuniao from '@/components/docs/pauta-reuniao';
 import PropostaComercial from '@/components/docs/proposta-comercial';
 import { createSupabaseBrowserClient } from '@/lib/supabase/browser';
 import { DocType } from '@/types/docs';
@@ -23,8 +22,6 @@ export default function DashboardPage() {
   const [desktopSidebarOpen, setDesktopSidebarOpen] = useState(true);
   const [mobileSidebarOpen, setMobileSidebarOpen] = useState(false);
   const [userEmail, setUserEmail] = useState<string | null>(null);
-  const [openSavedPautasToken] = useState(0);
-  const [openSavedPautaId, setOpenSavedPautaId] = useState<string | null>(null);
 
   useEffect(() => {
     supabase.auth
@@ -62,37 +59,18 @@ export default function DashboardPage() {
     router.refresh();
   };
 
-  const handleOpenSavedPauta = (id: string) => {
-    setActiveDoc('pauta-reuniao');
-    setOpenSavedPautaId(id);
-    if (isMobile) setMobileSidebarOpen(false);
-  };
-
   const desktopSidebarWidth = desktopSidebarOpen
     ? DESKTOP_SIDEBAR_OPEN_WIDTH
     : DESKTOP_SIDEBAR_CLOSED_WIDTH;
 
   const renderContent = () => {
     switch (activeDoc) {
-      case 'pauta-reuniao':
-        return (
-          <PautaReuniao
-            onBack={handleBack}
-            openSavedPautasToken={openSavedPautasToken}
-            openSavedPautaId={openSavedPautaId ?? undefined}
-          />
-        );
       case 'proposta-comercial':
         return <PropostaComercial onBack={handleBack} />;
       case 'clientes':
         return <Clientes onBack={handleBack} />;
       default:
-        return (
-          <DocHome
-            onSelectDoc={handleSelectDoc}
-            onOpenSavedPauta={handleOpenSavedPauta}
-          />
-        );
+        return <DocHome onSelectDoc={handleSelectDoc} />;
     }
   };
 

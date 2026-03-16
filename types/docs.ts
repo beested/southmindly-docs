@@ -23,25 +23,6 @@ export interface DocMenuItem {
   color: string;
 }
 
-export interface AgendaItem {
-  id: string;
-  titulo: string;
-  responsavel: string;
-  duracao: string;
-  topicos?: string[];
-}
-
-export interface PautaData {
-  titulo: string;
-  data: string;
-  horario: string;
-  local: string;
-  participantes: string;
-  objetivo: string;
-  observacoes: string;
-  itens: AgendaItem[];
-}
-
 export type PropostaEscopoData = PropostaEscopo;
 
 export type PropostaComercialData = PropostaComercial;
