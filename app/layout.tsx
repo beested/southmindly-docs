@@ -1,4 +1,5 @@
 import type { Metadata } from 'next';
+import { PageTransitionProvider } from '@/components/system/page-transition-provider';
 import { DM_Mono, DM_Serif_Display, Outfit } from 'next/font/google';
 import './globals.css';
 
@@ -38,7 +39,7 @@ export default function RootLayout({
       <body
         className={`${outfit.variable} ${dmSerif.variable} ${dmMono.variable} antialiased`}
       >
-        {children}
+        <PageTransitionProvider>{children}</PageTransitionProvider>
       </body>
     </html>
   );

@@ -1,17 +1,21 @@
 'use client';
 
 import { useRouter, useSearchParams } from 'next/navigation';
-import { useMemo, useState } from 'react';
+import { startTransition, useMemo, useState } from 'react';
 
+import { usePageTransition } from '@/components/system/page-transition-provider';
 import { Button } from '@/components/ui/button';
 import { createSupabaseBrowserClient } from '@/lib/supabase/browser';
+import { ArrowRight, Sparkles } from 'lucide-react';
 
 type Mode = 'signin' | 'signup';
 const INPUT_ACCENT = '#7C3AED';
 const INPUT_ACCENT_RING = 'rgba(124, 58, 237, 0.22)';
+const SUCCESS_ANIMATION_MS = 520;
 
 export default function LoginClient() {
   const router = useRouter();
+  const { startPageTransition } = usePageTransition();
   const searchParams = useSearchParams();
   const nextPath = searchParams.get('next') || '/dashboard';
 
@@ -21,12 +25,17 @@ export default function LoginClient() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [submitting, setSubmitting] = useState(false);
+  const [isSuccessAnimating, setIsSuccessAnimating] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const isBusy = submitting || isSuccessAnimating;
 
   const onSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    if (isBusy) return;
+
     setError(null);
     setSubmitting(true);
+    let didSucceed = false;
 
     try {
       const result =
@@ -39,23 +48,56 @@ export default function LoginClient() {
         return;
       }
 
-      router.push(nextPath);
-      router.refresh();
+      didSucceed = true;
+      setIsSuccessAnimating(true);
+
+      await new Promise((resolve) =>
+        window.setTimeout(resolve, SUCCESS_ANIMATION_MS),
+      );
+
+      startPageTransition(
+        () => {
+          startTransition(() => {
+            router.push(nextPath);
+            router.refresh();
+          });
+        },
+        { delayMs: 0 },
+      );
     } finally {
-      setSubmitting(false);
+      if (!didSucceed) {
+        setSubmitting(false);
+      }
     }
   };
 
   return (
-    <div className="flex min-h-screen items-center justify-center bg-[#0D0F14] p-6 text-[#E8EAF0]">
-      <div className="w-full max-w-md rounded-2xl border border-[#1E2130] bg-[#13161D] p-7 shadow-[0_24px_64px_rgba(0,0,0,0.35)]">
-        <div className="flex items-center gap-3 mb-6">
+    <div className="relative flex min-h-screen items-center justify-center overflow-hidden bg-[#0D0F14] p-6 text-[#E8EAF0]">
+      <div
+        className={`pointer-events-none absolute inset-0 transition-opacity duration-500 ${
+          isSuccessAnimating ? 'opacity-100' : 'opacity-0'
+        }`}
+      >
+        <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,rgba(124,58,237,0.24)_0%,rgba(124,58,237,0.10)_24%,rgba(13,15,20,0)_62%)]" />
+        <div className="absolute inset-0 bg-[linear-gradient(180deg,rgba(124,58,237,0.08)_0%,rgba(13,15,20,0)_46%)]" />
+      </div>
+
+      <div
+        className={`relative w-full max-w-md rounded-2xl border border-[#1E2130] bg-[#13161D] p-7 shadow-[0_24px_64px_rgba(0,0,0,0.35)] transition-all duration-500 ${
+          isSuccessAnimating
+            ? '-translate-y-3 scale-[0.97] border-[#7C3AED55] opacity-0 blur-sm'
+            : 'translate-y-0 scale-100 opacity-100 blur-0'
+        }`}
+      >
+        <div className="mb-6 flex items-center gap-3">
           <img
             src="/logo-icon.png"
             alt="SouthMindly"
             width={198}
             height={246}
-            className="h-10 w-auto object-contain"
+            className={`h-10 w-auto object-contain transition-transform duration-500 ${
+              isSuccessAnimating ? 'rotate-6 scale-110' : 'rotate-0 scale-100'
+            }`}
           />
           <div className="leading-tight">
             <div className="text-xs font-mono text-[#6B7280] tracking-[0.14em] uppercase">
@@ -77,6 +119,7 @@ export default function LoginClient() {
               onChange={(e) => setEmail(e.target.value)}
               type="email"
               required
+              disabled={isBusy}
               autoComplete="email"
               className="w-full rounded-lg border border-[#1E2130] bg-[#191C25] px-3.5 py-2.5 text-sm font-sans text-[#E8EAF0] outline-none placeholder:text-[#6B7280] placeholder:opacity-55 focus:border-[#7C3AED]"
               style={{
@@ -103,6 +146,7 @@ export default function LoginClient() {
               onChange={(e) => setPassword(e.target.value)}
               type="password"
               required
+              disabled={isBusy}
               autoComplete={
                 mode === 'signin' ? 'current-password' : 'new-password'
               }
@@ -131,14 +175,27 @@ export default function LoginClient() {
           <Button
             type="submit"
             variant="ghost"
-            disabled={submitting}
-            className="h-11 w-full rounded-xl bg-[#7C3AED] text-sm font-medium text-white transition-opacity hover:bg-[#7C3AED] hover:text-white disabled:opacity-60"
+            disabled={isBusy}
+            className="h-11 w-full rounded-xl bg-[#7C3AED] text-sm font-medium text-white transition-all hover:bg-[#7C3AED] hover:text-white disabled:opacity-100"
           >
-            {submitting
-              ? 'Aguarde...'
-              : mode === 'signin'
-                ? 'Entrar'
-                : 'Criar conta'}
+            {isSuccessAnimating ? (
+              <>
+                <Sparkles className="size-4" />
+                Entrando no sistema...
+              </>
+            ) : submitting ? (
+              <>
+                <span className="size-4 animate-spin rounded-full border-2 border-white/35 border-t-white" />
+                Aguarde...
+              </>
+            ) : mode === 'signin' ? (
+              <>
+                Entrar
+                <ArrowRight className="size-4" />
+              </>
+            ) : (
+              'Criar conta'
+            )}
           </Button>
         </form>
 
@@ -149,14 +206,28 @@ export default function LoginClient() {
           <Button
             type="button"
             variant="ghost"
+            disabled={isBusy}
             onClick={() => {
               setError(null);
               setMode((m) => (m === 'signin' ? 'signup' : 'signin'));
             }}
-            className="text-[#7C3AED] hover:bg-transparent hover:text-[#A78BFA]"
+            className="text-[#7C3AED] hover:bg-transparent hover:text-[#A78BFA] disabled:opacity-50"
           >
             {mode === 'signin' ? 'Criar conta' : 'Entrar'}
           </Button>
+        </div>
+      </div>
+
+      <div
+        className={`pointer-events-none absolute inset-0 flex items-center justify-center transition-all duration-500 ${
+          isSuccessAnimating ? 'opacity-100' : 'opacity-0'
+        }`}
+      >
+        <div className="rounded-full border border-[#7C3AED44] bg-[#7C3AED18] px-5 py-3 text-sm font-medium text-[#EDE9FE] shadow-[0_20px_60px_rgba(124,58,237,0.22)] backdrop-blur-md">
+          <div className="flex items-center gap-2">
+            <Sparkles className="size-4" />
+            Preparando seu dashboard...
+          </div>
         </div>
       </div>
     </div>
