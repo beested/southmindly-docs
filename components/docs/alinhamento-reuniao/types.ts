@@ -41,6 +41,7 @@ export type ClienteItem = {
   razaoSocial: string;
   cnpj: string;
   cidade: string;
+  endereco: string;
   nomeContato: string;
   cargoContato: string;
   emailContato: string;

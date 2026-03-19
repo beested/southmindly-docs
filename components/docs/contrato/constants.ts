@@ -4,8 +4,8 @@ import { ContratoData } from './types';
 
 export const southMindlyContractInfo = {
   nome: 'SouthMindly',
-  cnpj: '[CNPJ da SouthMindly]',
-  endereco: '[Endereço ou cidade/UF]',
+  cnpj: '19.618.599/0001-50',
+  endereco: 'Rua Marcílio Machado da Silveira 334',
 } as const;
 
 export const contractPrintStyles = `
@@ -87,17 +87,17 @@ export const scopeSectionDefs = [
 
 export const defaultContratoData: ContratoData = {
   clienteId: '',
-  contractTitle: 'CONTRATO PRESTAÇÃO DE SERVIÇOS PROFISSIONAIS',
+  contractTitle: 'CONTRATO DE PRESTAÇÃO DE SERVIÇOS PROFISSIONAIS',
   projectTitle: 'RECONSTRUÇÃO DE WEBSITE',
   proposalReference: 'Março de 2026',
-  contratanteNome: southMindlyContractInfo.nome,
-  contratanteCnpj: southMindlyContractInfo.cnpj,
-  contratanteEndereco: southMindlyContractInfo.endereco,
-  contratadaNome: '[Nome da Clínica]',
-  contratadaCnpj: '[CNPJ da Clínica]',
-  contratadaEndereco: '[Endereço completo]',
+  contratanteNome: '[Nome da Clínica]',
+  contratanteCnpj: '[CNPJ da Clínica]',
+  contratanteEndereco: '[Endereço completo]',
+  contratadaNome: southMindlyContractInfo.nome,
+  contratadaCnpj: southMindlyContractInfo.cnpj,
+  contratadaEndereco: southMindlyContractInfo.endereco,
   objectText:
-    'O presente contrato tem como objeto a prestação de serviços de reconstrução, modernização e otimização do website da CONTRATADA, conforme proposta apresentada em Março de 2026.',
+    'O presente contrato tem como objeto a prestação de serviços de reconstrução, modernização e otimização do website da CONTRATANTE, conforme proposta apresentada em Março de 2026.',
   objectAnnexClause:
     'O projeto contendo os serviços a serem desenvolvidos integra este instrumento como anexo, passando a fazer parte deste contrato para todos os efeitos.',
   objectStartClause:
@@ -106,20 +106,24 @@ export const defaultContratoData: ContratoData = {
   paymentSummary:
     'O preço ajustado neste contrato será pago conforme a condição comercial definida entre as partes, respeitando os vencimentos acordados no momento da contratação.',
   paymentInstallmentClause:
-    'Obriga-se a CONTRATADA a pagar o valor total de R$ 2.200,00 (dois mil e duzentos reais), podendo realizar o pagamento à vista via PIX ou boleto, ou de forma parcelada com entrada de 30% e 3 parcelas mensais.',
+    'Obriga-se a CONTRATANTE a pagar o valor total de R$ 2.200,00 (dois mil e duzentos reais), podendo realizar o pagamento à vista via PIX ou boleto, ou de forma parcelada com entrada de 30% e 3 parcelas mensais.',
   paymentRenewalClause:
     'Por se tratar de um projeto fechado de reconstrução de website, não há renovação automática. Qualquer nova etapa, manutenção ou ampliação será objeto de nova contratação.',
   paymentDefaultClause:
-    'Caso a CONTRATADA não cumpra com as obrigações de pagamento, a CONTRATANTE poderá suspender a continuidade do projeto até a regularização dos valores em aberto.',
+    'Caso a CONTRATANTE não cumpra com as obrigações de pagamento, a CONTRATADA poderá suspender a continuidade do projeto até a regularização dos valores em aberto.',
+  paymentLateFeeClause:
+    'O não pagamento por prazo superior a 10 (dez) dias do vencimento poderá acarretar multa moratória de 2% (dois por cento) sobre o valor devido, além de juros de 1% (um por cento) ao mês, calculados pro rata die.',
   rescisaoText:
     'O presente contrato poderá ser considerado rescindido de pleno direito pela parte prejudicada na ocorrência de descumprimento de qualquer de suas cláusulas, sem prejuízo da cobrança dos valores já vencidos e dos serviços efetivamente executados até a data da rescisão.',
   generalRightsClause:
-    'Ficam assegurados à CONTRATADA os direitos de uso do projeto após a quitação integral dos valores contratados, sem prejuízo do direito da CONTRATANTE de utilizar o trabalho em portfólio, apresentação comercial e divulgação de seus serviços.',
+    'Ficam assegurados à CONTRATANTE os direitos de uso do projeto após a quitação integral dos valores contratados, sem prejuízo do direito da CONTRATADA de utilizar o trabalho em portfólio, apresentação comercial e divulgação de seus serviços.',
   generalDelegationClause:
     'A CONTRATANTE não poderá, sem prévia concordância da CONTRATADA, transferir ou delegar integralmente as atribuições e responsabilidades assumidas por força deste contrato.',
   generalClosingClause:
     'E por assim estarem justas e contratadas, as partes assinam o presente instrumento em duas vias de igual teor.',
-  cidadeAssinatura: 'Caxias do Sul',
+  revisionDeliveryClause:
+    'Estão incluídas até 2 (duas) rodadas de ajustes por etapa entregue, desde que respeitado o escopo aprovado inicialmente. Solicitações adicionais ou alterações fora do escopo poderão ser tratadas como serviço complementar, com eventual revisão de prazo e valor.',
+  cidadeAssinatura: 'Caxias do Sul - RS',
   scopeHome: [
     'Reestruturação com foco institucional',
     'Destaque para diferenciais da clínica',
@@ -170,7 +174,7 @@ export const defaultContratoData: ContratoData = {
   cronogramaDesenvolvimento: '1 semana',
   cronogramaTestes: '1 semana',
   prazoCondicoes: [
-    'Atraso no envio de conteúdos por parte da CONTRATADA',
+    'Atraso no envio de conteúdos por parte da CONTRATANTE',
     'Demora na aprovação de etapas',
     'Solicitações adicionais fora do escopo',
   ].join('\n'),
@@ -182,14 +186,14 @@ export const defaultContratoData: ContratoData = {
   ].join('\n'),
   manutencaoValorHora: 'R$ 100,00 por hora trabalhada',
   responsabilidadesContratante: [
-    'Executar o projeto conforme escopo definido',
-    'Garantir qualidade técnica e visual',
-    'Manter comunicação clara durante o desenvolvimento',
-  ].join('\n'),
-  responsabilidadesContratada: [
     'Fornecer textos, imagens e informações necessárias',
     'Aprovar etapas dentro dos prazos acordados',
     'Indicar responsável pelo acompanhamento do projeto',
+  ].join('\n'),
+  responsabilidadesContratada: [
+    'Executar o projeto conforme escopo definido',
+    'Garantir qualidade técnica e visual',
+    'Manter comunicação clara durante o desenvolvimento',
   ].join('\n'),
   alteracoesServicosAdicionais:
     'Qualquer solicitação fora do escopo definido neste contrato será considerada como serviço adicional, podendo gerar custos extras e impacto no prazo.',
@@ -197,17 +201,17 @@ export const defaultContratoData: ContratoData = {
     'Não haverá devolução dos valores já pagos',
     'A CONTRATADA terá direito ao material já desenvolvido até o momento',
   ].join('\n'),
-  entregaProjeto: ['Publicação do site', 'Validação final da CONTRATADA'].join(
+  entregaProjeto: ['Publicação do site', 'Validação final da CONTRATANTE'].join(
     '\n',
   ),
   direitosUsoPortfolio:
-    'A CONTRATANTE poderá utilizar o projeto desenvolvido para fins de portfólio, apresentação comercial e divulgação de seus serviços.',
+    'A CONTRATADA poderá utilizar o projeto desenvolvido para fins de portfólio, apresentação comercial e divulgação de seus serviços.',
   disposicoesGerais: [
     'Este contrato não gera vínculo empregatício entre as partes',
     'Ambas as partes concordam com os termos descritos neste documento',
   ].join('\n'),
   foroCidadeUf: 'Caxias do Sul - RS',
-  assinaturaContratanteLabel: 'SouthMindly Soluções Digitais LTDA',
+  assinaturaContratanteLabel: 'CONTRATANTE',
   assinaturaContratadaLabel: 'CONTRATADA',
   dataAssinatura: '',
 };

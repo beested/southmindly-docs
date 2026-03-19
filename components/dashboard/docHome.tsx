@@ -32,6 +32,7 @@ type ClienteListItem = {
   id: string;
   razaoSocial: string;
   cidade: string;
+  endereco: string;
   ativo: boolean;
   createdAt: string;
 };

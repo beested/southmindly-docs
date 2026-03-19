@@ -13,6 +13,7 @@ const clienteSchema = z.object({
   telefoneContato: z.string().optional().default(''),
   logoUrl: z.string().optional().default(''),
   cidade: z.string().optional().default(''),
+  endereco: z.string().optional().default(''),
   ativo: z.boolean().optional(),
 });
 
@@ -57,6 +58,7 @@ export async function PUT(
       telefone_contato: c.telefoneContato || null,
       logo_url: c.logoUrl || null,
       cidade: c.cidade || null,
+      endereco: c.endereco || null,
     };
 
     if (typeof c.ativo === 'boolean') payload.ativo = c.ativo;
@@ -66,7 +68,7 @@ export async function PUT(
       .update(payload)
       .eq('id', id)
       .select(
-        'id, razao_social, cnpj, cidade, nome_contato, cargo_contato, email_contato, telefone_contato, logo_url, ativo, criado_em',
+        'id, razao_social, cnpj, cidade, endereco, nome_contato, cargo_contato, email_contato, telefone_contato, logo_url, ativo, criado_em',
       )
       .single();
 
@@ -82,6 +84,7 @@ export async function PUT(
       razao_social: string | null;
       cnpj: string | null;
       cidade: string | null;
+      endereco: string | null;
       nome_contato: string | null;
       cargo_contato: string | null;
       email_contato: string | null;
@@ -98,6 +101,7 @@ export async function PUT(
       razaoSocial: row.razao_social ?? '',
       cnpj: row.cnpj ?? '',
       cidade: row.cidade ?? '',
+      endereco: row.endereco ?? '',
       nomeContato: row.nome_contato ?? '',
       cargoContato: row.cargo_contato ?? '',
       emailContato: row.email_contato ?? '',

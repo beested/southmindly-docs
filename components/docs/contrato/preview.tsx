@@ -3,7 +3,7 @@
 import { format } from 'date-fns';
 import { ptBR } from 'date-fns/locale';
 
-import { scopeSectionDefs } from './constants';
+import { scopeSectionDefs, southMindlyContractInfo } from './constants';
 import { ContratoData } from './types';
 
 function splitLines(value: string) {
@@ -84,10 +84,11 @@ export function ContractPreview({ data }: { data: ContratoData }) {
   const responsabilidadesContratada = splitLines(
     data.responsabilidadesContratada,
   );
-  const signatureLocation = data.foroCidadeUf.trim() || 'Cidade não informada';
+  const signatureLocation =
+    data.cidadeAssinatura.trim() || data.foroCidadeUf.trim() || 'Cidade não informada';
   const generatedDateLabel = formatGeneratedDate(new Date());
   const contratadaSignatureLabel =
-    data.contratadaNome.trim() || data.assinaturaContratadaLabel;
+    data.contratadaNome.trim() || southMindlyContractInfo.nome;
 
   return (
     <div
@@ -126,7 +127,7 @@ export function ContractPreview({ data }: { data: ContratoData }) {
         </section>
 
         <div className="mt-6 text-[14px] leading-7 text-[#374151]">
-          Tem entre si, justo e contratado, o presente contrato de prestação de
+          Têm entre si, justo e contratado, o presente contrato de prestação de
           serviços, mediante as cláusulas e condições seguintes:
         </div>
 
@@ -188,30 +189,22 @@ export function ContractPreview({ data }: { data: ContratoData }) {
               </span>{' '}
               {data.paymentDefaultClause}
             </p>
+            <p>
+              <span className="font-semibold text-[#111827]">
+                Parágrafo Quarto:
+              </span>{' '}
+              {data.paymentLateFeeClause}
+            </p>
           </PreviewSection>
 
-          <PreviewSection number="4" title="Obrigações da Contratante">
+          <PreviewSection number="4" title="Obrigações da Contratada">
             <p>
               <span className="font-semibold text-[#111827]">
                 CLÁUSULA TERCEIRA:
               </span>{' '}
-              A CONTRATANTE se obriga a desenvolver o serviço objeto do contrato
+              A CONTRATADA se obriga a desenvolver o serviço objeto do contrato
               dentro das especificações aprovadas e utilizando os recursos
               previstos no anexo deste instrumento.
-            </p>
-            <ul className="list-disc space-y-1 pl-5">
-              {responsabilidadesContratante.map((item) => (
-                <li key={item}>{item}</li>
-              ))}
-            </ul>
-          </PreviewSection>
-
-          <PreviewSection number="5" title="Obrigações da Contratada">
-            <p>
-              <span className="font-semibold text-[#111827]">
-                CLÁUSULA QUARTA:
-              </span>{' '}
-              São obrigações da CONTRATADA:
             </p>
             <ul className="list-disc space-y-1 pl-5">
               {responsabilidadesContratada.map((item) => (
@@ -220,19 +213,42 @@ export function ContractPreview({ data }: { data: ContratoData }) {
             </ul>
           </PreviewSection>
 
-          <PreviewSection number="6" title="Da Rescisão">
+          <PreviewSection number="5" title="Obrigações da Contratante">
+            <p>
+              <span className="font-semibold text-[#111827]">
+                CLÁUSULA QUARTA:
+              </span>{' '}
+              São obrigações da CONTRATANTE:
+            </p>
+            <ul className="list-disc space-y-1 pl-5">
+              {responsabilidadesContratante.map((item) => (
+                <li key={item}>{item}</li>
+              ))}
+            </ul>
+          </PreviewSection>
+
+          <PreviewSection number="6" title="Entregas e Revisões">
             <p>
               <span className="font-semibold text-[#111827]">
                 CLÁUSULA QUINTA:
+              </span>{' '}
+              {data.revisionDeliveryClause}
+            </p>
+          </PreviewSection>
+
+          <PreviewSection number="7" title="Da Rescisão">
+            <p>
+              <span className="font-semibold text-[#111827]">
+                CLÁUSULA SEXTA:
               </span>{' '}
               {data.rescisaoText}
             </p>
           </PreviewSection>
 
-          <PreviewSection number="7" title="Disposições Gerais">
+          <PreviewSection number="8" title="Disposições Gerais">
             <p>
               <span className="font-semibold text-[#111827]">
-                CLÁUSULA SEXTA:
+                CLÁUSULA SÉTIMA:
               </span>{' '}
               {data.generalRightsClause}
             </p>
@@ -247,7 +263,7 @@ export function ContractPreview({ data }: { data: ContratoData }) {
             <p>{data.generalClosingClause}</p>
           </PreviewSection>
 
-          <PreviewSection number="8" title="Anexo" avoidBreak={false}>
+          <PreviewSection number="9" title="Anexo" avoidBreak={false}>
             <p>
               Escopo do projeto de reconstrução de website que integra este
               contrato:

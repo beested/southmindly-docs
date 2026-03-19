@@ -11,6 +11,7 @@ import {
   contractPrintStyles,
   defaultContratoData,
   scopeSectionDefs,
+  southMindlyContractInfo,
 } from './constants';
 import { ContractPreview } from './preview';
 import { ClienteItem, ContratoData, ContratoProps } from './types';
@@ -90,9 +91,9 @@ export default function Contrato({ onBack }: ContratoProps) {
       setData((current) => ({
         ...current,
         clienteId,
-        contratadaNome: cliente?.razaoSocial || '',
-        contratadaCnpj: cliente?.cnpj || '',
-        contratadaEndereco: cliente?.cidade || '',
+        contratanteNome: cliente?.razaoSocial || '',
+        contratanteCnpj: cliente?.cnpj || '',
+        contratanteEndereco: cliente?.endereco || cliente?.cidade || '',
       }));
     },
     [clientes],
@@ -287,11 +288,11 @@ export default function Contrato({ onBack }: ContratoProps) {
               <SectionTitle
                 eyebrow="Partes"
                 title="Contratante e contratada"
-                description="A SouthMindly fica como contratante e o cliente selecionado preenche a contratada."
+                description="O cliente selecionado preenche a contratante e a SouthMindly permanece como contratada."
               />
 
               <SelectField
-                label="Contratada (cliente)"
+                label="Contratante (cliente)"
                 value={data.clienteId}
                 onChange={handleClienteChange}
                 options={clientes.map((cliente) => ({
@@ -324,13 +325,13 @@ export default function Contrato({ onBack }: ContratoProps) {
                         </div>
                       </div>
                     ) : null}
-                    {selectedCliente.cidade ? (
+                    {selectedCliente.endereco || selectedCliente.cidade ? (
                       <div className="rounded-2xl border border-[#1E2130] bg-[#13161D] px-3 py-2.5">
                         <div className="text-[10px] font-mono uppercase tracking-[0.12em] text-[#6B7280]">
-                          Cidade
+                          Endereço
                         </div>
                         <div className="mt-1 text-[13px] text-[#E8EAF0]">
-                          {selectedCliente.cidade}
+                          {selectedCliente.endereco || selectedCliente.cidade}
                         </div>
                       </div>
                     ) : null}
@@ -376,11 +377,14 @@ export default function Contrato({ onBack }: ContratoProps) {
               <Field
                 label="Foro"
                 value={data.foroCidadeUf}
-                onChange={(value) => {
-                  updateField('foroCidadeUf', value);
-                  updateField('cidadeAssinatura', value);
-                }}
+                onChange={(value) => updateField('foroCidadeUf', value)}
                 placeholder="Ex: Porto Alegre/RS"
+              />
+              <Field
+                label="Cidade da assinatura"
+                value={data.cidadeAssinatura}
+                onChange={(value) => updateField('cidadeAssinatura', value)}
+                placeholder="Ex: Caxias do Sul - RS"
               />
               <Field
                 label="Assinatura contratante"
@@ -389,6 +393,18 @@ export default function Contrato({ onBack }: ContratoProps) {
                   updateField('assinaturaContratanteLabel', value)
                 }
               />
+              <div className="mb-4 rounded-[20px] border border-[#252A3A] bg-[#13161D] p-4">
+                <div className="text-[10px] font-mono uppercase tracking-[0.12em] text-[#6B7280]">
+                  Contratada fixa
+                </div>
+                <div className="mt-2 text-[15px] font-semibold text-[#F3F4F6]">
+                  {southMindlyContractInfo.nome}
+                </div>
+                <div className="mt-1 text-[12px] text-[#8B93A7]">
+                  Todos os campos da contratada permanecem vinculados à
+                  SouthMindly.
+                </div>
+              </div>
             </div>
 
             <div className="overflow-y-auto p-4 sm:p-5 lg:p-[28px_32px]">
@@ -460,11 +476,17 @@ export default function Contrato({ onBack }: ContratoProps) {
                 onChange={(value) => updateField('paymentDefaultClause', value)}
                 rows={3}
               />
+              <TextAreaField
+                label="Parágrafo quarto"
+                value={data.paymentLateFeeClause}
+                onChange={(value) => updateField('paymentLateFeeClause', value)}
+                rows={3}
+              />
 
               <SectionTitle
-                eyebrow="Cláusulas 3 a 7"
-                title="Obrigações, rescisão e disposições gerais"
-                description="Siga a mesma organização do PDF-base para responsabilidades e encerramento."
+                eyebrow="Cláusulas 3 a 8"
+                title="Obrigações, revisões, rescisão e disposições gerais"
+                description="Ajuste as responsabilidades das partes, a política de revisões e as cláusulas finais do contrato."
               />
 
               <TextAreaField
@@ -484,6 +506,12 @@ export default function Contrato({ onBack }: ContratoProps) {
                 }
                 rows={5}
                 placeholder="Uma responsabilidade por linha"
+              />
+              <TextAreaField
+                label="Entregas e revisões"
+                value={data.revisionDeliveryClause}
+                onChange={(value) => updateField('revisionDeliveryClause', value)}
+                rows={4}
               />
               <TextAreaField
                 label="Texto de rescisão"

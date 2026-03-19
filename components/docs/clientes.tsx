@@ -2,6 +2,7 @@
 
 import { Button } from '@/components/ui/button';
 import { Field, ToggleField } from '@/components/ui/inputs';
+import { AddressInput } from '@/components/ui/inputs/address-input';
 import { CnpjInput } from '@/components/ui/inputs/cnpj-input';
 import { PhoneInput } from '@/components/ui/inputs/phone-input';
 import {
@@ -33,6 +34,7 @@ type Cliente = {
   telefoneContato: string;
   logoUrl: string;
   cidade: string;
+  endereco: string;
   ativo: boolean;
   createdAt: string;
 };
@@ -50,6 +52,7 @@ type ClienteForm = {
   telefoneContato: string;
   logoUrl: string;
   cidade: string;
+  endereco: string;
   ativo: boolean;
 };
 
@@ -62,6 +65,7 @@ const emptyForm: ClienteForm = {
   telefoneContato: '',
   logoUrl: '',
   cidade: '',
+  endereco: '',
   ativo: true,
 };
 
@@ -119,6 +123,7 @@ export default function Clientes({ onBack }: ClientesProps) {
         c.razaoSocial,
         c.cnpj,
         c.cidade,
+        c.endereco,
         c.nomeContato,
         c.emailContato,
         c.telefoneContato,
@@ -147,6 +152,7 @@ export default function Clientes({ onBack }: ClientesProps) {
       telefoneContato: c.telefoneContato,
       logoUrl: c.logoUrl,
       cidade: c.cidade,
+      endereco: c.endereco,
       ativo: c.ativo,
     });
     setLogoPreview(c.logoUrl || null);
@@ -204,6 +210,7 @@ export default function Clientes({ onBack }: ClientesProps) {
             telefoneContato: form.telefoneContato.trim(),
             logoUrl: form.logoUrl.trim(),
             cidade: form.cidade.trim(),
+            endereco: form.endereco.trim(),
             ativo: form.ativo,
           },
         }),
@@ -317,7 +324,7 @@ export default function Clientes({ onBack }: ClientesProps) {
                 label="Cidade"
                 value={form.cidade}
                 onChange={(v) => setForm((f) => ({ ...f, cidade: v }))}
-                placeholder="Ex: São Paulo"
+                placeholder="Ex: Farroupilha/RS"
               />
               <ToggleField
                 label="Status"
@@ -328,6 +335,16 @@ export default function Clientes({ onBack }: ClientesProps) {
                 checkedLabel="Ativo"
                 uncheckedLabel="Inativo"
               />
+            </div>
+            <Field
+              label="Endereço"
+              value={form.endereco}
+              onChange={(v) => setForm((f) => ({ ...f, endereco: v }))}
+              placeholder="Ex: Rua Rui Barbosa, 12, Sala 10 - Centro - Farroupilha/RS"
+              renderInput={(inputProps) => <AddressInput {...inputProps} />}
+            />
+            <div className="-mt-2 mb-4 text-[11px] leading-5 text-[#6B7280]">
+              Preencha o endereço completo em uma linha.
             </div>
 
             <div className="text-[10px] font-mono text-[#A78BFA] tracking-[0.15em] uppercase mb-4 mt-6 pt-5 border-t border-[#1E2130]">
@@ -497,6 +514,7 @@ export default function Clientes({ onBack }: ClientesProps) {
                     <div className="text-[11px] text-[#6B7280] font-mono mt-1">
                       {c.cnpj ? `${c.cnpj} · ` : ''}
                       {c.cidade ? `${c.cidade} · ` : ''}
+                      {c.endereco ? `${c.endereco} · ` : ''}
                       {c.nomeContato ? c.nomeContato : 'Sem contato'}{' '}
                       {c.emailContato ? `· ${c.emailContato}` : ''}
                     </div>

@@ -19,7 +19,9 @@ export type ContratoData = {
   paymentInstallmentClause: string;
   paymentRenewalClause: string;
   paymentDefaultClause: string;
+  paymentLateFeeClause: string;
   rescisaoText: string;
+  revisionDeliveryClause: string;
   generalRightsClause: string;
   generalDelegationClause: string;
   generalClosingClause: string;
@@ -65,6 +67,7 @@ export type ClienteItem = {
   razaoSocial: string;
   cnpj: string;
   cidade: string;
+  endereco: string;
   nomeContato: string;
   cargoContato: string;
   emailContato: string;
