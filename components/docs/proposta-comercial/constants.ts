@@ -152,13 +152,11 @@ export const budgetScopeDefinitions = [
     label: 'Escopo 01 - Gestão Digital: Postagens em redes sociais',
     rows: [
       {
-        periodicidade:
-          '04 (quatro) postagens por mês (uma por semana)',
+        periodicidade: '04 (quatro) postagens por mês (uma por semana)',
         investimento: 'R$ 600,00 por mês',
       },
       {
-        periodicidade:
-          '02 (duas) postagens por mês (uma por quinzena)',
+        periodicidade: '02 (duas) postagens por mês (uma por quinzena)',
         investimento: 'R$ 300,00 por mês',
       },
     ],
@@ -198,36 +196,55 @@ export const budgetScopeDefinitions = [
 export const printStyles = `
   @media print {
     @page { margin: 0; size: A4 portrait; }
+
     html, body {
-      width: 210mm;
-      margin: 0;
-      padding: 0;
-      overflow: visible;
+      width: 210mm !important;
+      height: auto !important;
+      margin: 0 !important;
+      padding: 0 !important;
+      overflow: visible !important;
+      background: #05070B;
     }
-    body { background: #05070B; }
+
+    /* Zera padding/margin de TODOS os ancestrais do preview-doc */
+    body > *, body > * > *, body > * > * > *,
+    body > * > * > * > *, body > * > * > * > * > * {
+      margin: 0 !important;
+      padding: 0 !important;
+      width: 210mm !important;
+      max-width: none !important;
+      overflow: visible !important;
+      height: auto !important;
+      min-height: 0 !important;
+      border: none !important;
+      background: transparent !important;
+    }
+
     body * { visibility: hidden; }
     #preview-doc, #preview-doc * { visibility: visible; }
+
     #preview-doc {
-      position: absolute;
-      top: 0;
-      left: 0;
+      position: static !important;
+      display: block !important;
       width: 210mm !important;
       margin: 0 !important;
       padding: 0 !important;
-      max-width: none !important;
-      background: transparent !important;
+      overflow: visible !important;
     }
+
     #preview-doc .proposal-page {
       box-sizing: border-box !important;
+      display: block !important;
       width: 210mm !important;
       height: 297mm !important;
-      min-height: 297mm !important;
       margin: 0 !important;
       padding: 40px !important;
       box-shadow: none !important;
       border-radius: 0 !important;
       max-width: none !important;
       overflow: hidden !important;
+      break-inside: avoid;
+      page-break-inside: avoid;
       page-break-after: always;
       break-after: page;
       background-color: #05070B !important;
@@ -237,6 +254,7 @@ export const printStyles = `
       print-color-adjust: exact;
       -webkit-print-color-adjust: exact;
     }
+
     #preview-doc .proposal-page:last-child {
       page-break-after: auto;
       break-after: auto;

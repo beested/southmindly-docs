@@ -2,6 +2,8 @@
 
 import { usePageTransition } from '@/components/system/page-transition-provider';
 import DocHome from '@/components/dashboard/docHome';
+import AlinhamentoReuniao from '@/components/docs/alinhamento-reuniao';
+import Contrato from '@/components/docs/contrato';
 import Sidebar, {
   DESKTOP_SIDEBAR_CLOSED_WIDTH,
   DESKTOP_SIDEBAR_OPEN_WIDTH,
@@ -12,7 +14,14 @@ import { createSupabaseBrowserClient } from '@/lib/supabase/browser';
 import { DocType } from '@/types/docs';
 import { PanelLeft } from 'lucide-react';
 import { useRouter } from 'next/navigation';
-import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import {
+  type CSSProperties,
+  useCallback,
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
+} from 'react';
 
 const DASHBOARD_VIEW_EXIT_MS = 140;
 const DASHBOARD_VIEW_ENTER_MS = 220;
@@ -176,6 +185,10 @@ export default function DashboardPage() {
 
   const renderContent = () => {
     switch (activeDoc) {
+      case 'alinhamento-reuniao':
+        return <AlinhamentoReuniao onBack={handleBack} />;
+      case 'contrato':
+        return <Contrato onBack={handleBack} />;
       case 'proposta-comercial':
         return <PropostaComercial onBack={handleBack} />;
       case 'clientes':
@@ -186,13 +199,13 @@ export default function DashboardPage() {
   };
 
   return (
-    <div className="flex min-h-screen overflow-hidden bg-[#0D0F14]">
+    <div className="flex min-h-screen overflow-x-hidden bg-[#0D0F14] print:block print:min-h-0 print:bg-transparent">
       {isMobile && mobileSidebarOpen ? (
         <button
           type="button"
           aria-label="Fechar menu"
           onClick={() => setMobileSidebarOpen(false)}
-          className="fixed inset-0 z-[180] bg-black/50 lg:hidden"
+          className="fixed inset-0 z-[180] bg-black/50 print:hidden lg:hidden"
         />
       ) : null}
 
@@ -218,7 +231,7 @@ export default function DashboardPage() {
         <button
           type="button"
           onClick={() => setMobileSidebarOpen(true)}
-          className="fixed left-4 top-4 z-[190] flex size-11 items-center justify-center rounded-2xl border border-[#1E2130] bg-[#13161D] text-[#E8EAF0] shadow-[0_14px_30px_rgba(0,0,0,0.35)] lg:hidden"
+          className="fixed left-4 top-4 z-[190] flex size-11 items-center justify-center rounded-2xl border border-[#1E2130] bg-[#13161D] text-[#E8EAF0] shadow-[0_14px_30px_rgba(0,0,0,0.35)] print:hidden lg:hidden"
           aria-label="Abrir menu"
         >
           <PanelLeft className="size-5" />
@@ -226,14 +239,20 @@ export default function DashboardPage() {
       ) : null}
 
       <main
-        className="flex min-h-screen min-w-0 flex-col overflow-hidden transition-[margin,width] duration-300 ease-out"
-        style={{
-          marginLeft: isMobile ? 0 : desktopSidebarWidth,
-          width: isMobile ? '100%' : `calc(100% - ${desktopSidebarWidth}px)`,
-        }}
+        className="ml-[var(--dashboard-main-margin)] w-[var(--dashboard-main-width)] flex min-h-screen min-w-0 flex-col overflow-x-hidden transition-[margin,width] duration-300 ease-out print:ml-0 print:w-full print:min-h-0 print:overflow-visible"
+        style={
+          {
+            '--dashboard-main-margin': isMobile
+              ? '0px'
+              : `${desktopSidebarWidth}px`,
+            '--dashboard-main-width': isMobile
+              ? '100%'
+              : `calc(100% - ${desktopSidebarWidth}px)`,
+          } as CSSProperties
+        }
       >
         <div
-          className={`min-h-screen overflow-hidden ${
+          className={`min-h-screen overflow-x-hidden print:min-h-0 print:overflow-visible ${
             contentPhase === 'exit'
               ? 'sm-page-transition-exit'
               : contentPhase === 'enter'

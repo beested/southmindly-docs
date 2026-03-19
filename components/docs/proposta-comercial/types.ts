@@ -5,6 +5,7 @@ import { PropostaComercialData } from '@/types/docs';
 export type ClienteItem = {
   id: string;
   razaoSocial: string;
+  cnpj: string;
   cidade: string;
   nomeContato: string;
   cargoContato: string;

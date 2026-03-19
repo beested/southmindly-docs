@@ -6,6 +6,7 @@ import type {
 } from '@/lib/schemas/proposta-comercial';
 
 export type DocType =
+  | 'alinhamento-reuniao'
   | 'pauta-reuniao'
   | 'ata-reuniao'
   | 'proposta-comercial'

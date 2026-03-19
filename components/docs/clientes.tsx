@@ -2,6 +2,7 @@
 
 import { Button } from '@/components/ui/button';
 import { Field, ToggleField } from '@/components/ui/inputs';
+import { CnpjInput } from '@/components/ui/inputs/cnpj-input';
 import { PhoneInput } from '@/components/ui/inputs/phone-input';
 import {
   Select,
@@ -25,6 +26,7 @@ import { useCallback, useEffect, useMemo, useState } from 'react';
 type Cliente = {
   id: string;
   razaoSocial: string;
+  cnpj: string;
   nomeContato: string;
   cargoContato: string;
   emailContato: string;
@@ -41,6 +43,7 @@ interface ClientesProps {
 
 type ClienteForm = {
   razaoSocial: string;
+  cnpj: string;
   nomeContato: string;
   cargoContato: string;
   emailContato: string;
@@ -52,6 +55,7 @@ type ClienteForm = {
 
 const emptyForm: ClienteForm = {
   razaoSocial: '',
+  cnpj: '',
   nomeContato: '',
   cargoContato: '',
   emailContato: '',
@@ -113,6 +117,7 @@ export default function Clientes({ onBack }: ClientesProps) {
     return clientes.filter((c) =>
       [
         c.razaoSocial,
+        c.cnpj,
         c.cidade,
         c.nomeContato,
         c.emailContato,
@@ -135,6 +140,7 @@ export default function Clientes({ onBack }: ClientesProps) {
     setEditingId(c.id);
     setForm({
       razaoSocial: c.razaoSocial,
+      cnpj: c.cnpj,
       nomeContato: c.nomeContato,
       cargoContato: c.cargoContato,
       emailContato: c.emailContato,
@@ -191,6 +197,7 @@ export default function Clientes({ onBack }: ClientesProps) {
         body: JSON.stringify({
           cliente: {
             razaoSocial: form.razaoSocial.trim(),
+            cnpj: form.cnpj.trim(),
             nomeContato: form.nomeContato.trim(),
             cargoContato: form.cargoContato.trim(),
             emailContato: form.emailContato.trim(),
@@ -295,6 +302,14 @@ export default function Clientes({ onBack }: ClientesProps) {
               value={form.razaoSocial}
               onChange={(v) => setForm((f) => ({ ...f, razaoSocial: v }))}
               placeholder="Ex: SouthMindly LTDA"
+            />
+
+            <Field
+              label="CNPJ"
+              value={form.cnpj}
+              onChange={(v) => setForm((f) => ({ ...f, cnpj: v }))}
+              placeholder="00.000.000/0000-00"
+              renderInput={(inputProps) => <CnpjInput {...inputProps} />}
             />
 
             <div className="grid grid-cols-1 gap-2.5 sm:grid-cols-2">
@@ -480,6 +495,7 @@ export default function Clientes({ onBack }: ClientesProps) {
                       )}
                     </div>
                     <div className="text-[11px] text-[#6B7280] font-mono mt-1">
+                      {c.cnpj ? `${c.cnpj} · ` : ''}
                       {c.cidade ? `${c.cidade} · ` : ''}
                       {c.nomeContato ? c.nomeContato : 'Sem contato'}{' '}
                       {c.emailContato ? `· ${c.emailContato}` : ''}

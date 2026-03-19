@@ -286,9 +286,12 @@ export default function PropostaComercial({ onBack }: PropostaComercialProps) {
 
   const handlePrint = useCallback(() => {
     setActiveTab('preview');
-    setTimeout(() => window.print(), 50);
+    setTimeout(() => {
+      document.body.classList.add('printing');
+      window.print();
+      document.body.classList.remove('printing');
+    }, 50);
   }, []);
-
   return (
     <>
       <style>{printStyles}</style>

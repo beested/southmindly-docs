@@ -122,43 +122,45 @@ export function PropostaPreview({
           backgroundSize: 'cover',
         }}
       >
-        <div className="relative z-10 mb-14 flex flex-col items-center pt-6 text-center">
-          <img
-            src={southMindlyLogoSrc}
-            alt="SouthMindly"
-            className="mb-12 h-16 w-auto object-contain"
-          />
-
-          <div className="text-sm font-mono uppercase tracking-[0.2em] text-[#6B7280]">
-            Proposta N° {proposta.numeroProposta || '—'} (Rev.{' '}
-            {proposta.revisao || '—'})
-          </div>
-
-          <div className="mt-3 text-sm font-mono tracking-[0.18em] text-[#8C92A4]">
-            {[proposta.cidade || cliente?.cidade, proposta.dataProposta]
-              .filter(Boolean)
-              .join(' · ') || '—'}
-          </div>
-
-          <div className="mt-8 text-[42px] font-semibold uppercase leading-[1.05] tracking-[0.08em] text-[#E8EAF0]">
-            <div>Proposta de</div>
-            <div>Prestação de Serviços</div>
-          </div>
-
-          {cliente?.logoUrl && (
+        <div className="relative z-10 flex h-full flex-col">
+          <div className="mb-14 flex flex-col items-center pt-6 text-center">
             <img
-              src={cliente.logoUrl}
-              alt={cliente.razaoSocial}
-              className="mt-16 h-32 w-auto max-w-[340px] object-contain"
+              src={southMindlyLogoSrc}
+              alt="SouthMindly"
+              className="mb-12 h-16 w-auto object-contain"
             />
-          )}
 
-          <div className="mt-4 text-lg font-medium text-[#E8EAF0]">
-            {cliente?.nomeContato || '—'}
+            <div className="text-sm font-mono uppercase tracking-[0.2em] text-[#6B7280]">
+              Proposta N° {proposta.numeroProposta || '—'} (Rev.{' '}
+              {proposta.revisao || '—'})
+            </div>
+
+            <div className="mt-3 text-sm font-mono tracking-[0.18em] text-[#8C92A4]">
+              {[proposta.cidade || cliente?.cidade, proposta.dataProposta]
+                .filter(Boolean)
+                .join(' · ') || '—'}
+            </div>
+
+            <div className="mt-8 text-[42px] font-semibold uppercase leading-[1.05] tracking-[0.08em] text-[#E8EAF0]">
+              <div>Proposta de</div>
+              <div>Prestação de Serviços</div>
+            </div>
+
+            {cliente?.logoUrl && (
+              <img
+                src={cliente.logoUrl}
+                alt={cliente.razaoSocial}
+                className="mt-16 h-32 w-auto max-w-[340px] object-contain"
+              />
+            )}
+
+            <div className="mt-4 text-lg font-medium text-[#E8EAF0]">
+              {cliente?.nomeContato || '—'}
+            </div>
           </div>
-        </div>
 
-        {renderFooter(1)}
+          {renderFooter(1)}
+        </div>
       </div>
 
       <div

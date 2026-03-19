@@ -33,7 +33,7 @@ export default function Sidebar({
 }: SidebarProps) {
   return (
     <aside
-      className={`fixed top-0 left-0 z-[200] flex h-screen flex-col overflow-hidden border-r border-[#1E2130] bg-[#13161D] transition-all duration-300 ease-out ${
+      className={`fixed top-0 left-0 z-[200] flex h-screen flex-col overflow-hidden border-r border-[#1E2130] bg-[#13161D] transition-all duration-300 ease-out print:hidden ${
         isMobile
           ? `${open ? 'translate-x-0' : '-translate-x-full'} shadow-[0_24px_80px_rgba(0,0,0,0.45)]`
           : ''

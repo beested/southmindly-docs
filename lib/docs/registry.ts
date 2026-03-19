@@ -16,6 +16,15 @@ const SOUTHMINDLY_PURPLE = '#7C3AED';
 
 export const DOC_DEFINITIONS: DocDefinition[] = [
   {
+    id: 'alinhamento-reuniao',
+    label: 'Alinhamento de Reunião',
+    description: 'Organize serviços, cronograma e condições comerciais',
+    icon: ClipboardList,
+    available: true,
+    color: SOUTHMINDLY_PURPLE,
+    hasSavedList: false,
+  },
+  {
     id: 'pauta-reuniao',
     label: 'Pauta de Reunião',
     description: 'Estruture pontos, responsáveis e horários',
@@ -59,8 +68,7 @@ export const DOC_DEFINITIONS: DocDefinition[] = [
     label: 'Contrato',
     description: 'Monte contratos completos com variáveis',
     icon: ScrollText,
-    available: false,
-    badge: 'Em breve',
+    available: true,
     color: SOUTHMINDLY_PURPLE,
     hasSavedList: false,
   },
