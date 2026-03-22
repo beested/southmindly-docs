@@ -1,9 +1,10 @@
 'use client';
 
-import { format } from 'date-fns';
-import { ptBR } from 'date-fns/locale';
-
-import { scopeSectionDefs, southMindlyContractInfo } from './constants';
+import {
+  getAnnexIntro,
+  getScopeSectionDefs,
+  southMindlyContractInfo,
+} from './constants';
 import { ContratoData } from './types';
 
 function splitLines(value: string) {
@@ -11,10 +12,6 @@ function splitLines(value: string) {
     .split('\n')
     .map((line) => line.trim())
     .filter(Boolean);
-}
-
-function formatGeneratedDate(value: Date) {
-  return format(value, "dd 'de' MMMM 'de' yyyy", { locale: ptBR });
 }
 
 function PartyCard({
@@ -78,15 +75,15 @@ function PreviewSection({
 }
 
 export function ContractPreview({ data }: { data: ContratoData }) {
+  const scopeSectionDefs = getScopeSectionDefs(data.templateId);
+  const annexIntro = getAnnexIntro(data.templateId);
   const responsabilidadesContratante = splitLines(
     data.responsabilidadesContratante,
   );
   const responsabilidadesContratada = splitLines(
     data.responsabilidadesContratada,
   );
-  const signatureLocation =
-    data.cidadeAssinatura.trim() || data.foroCidadeUf.trim() || 'Cidade não informada';
-  const generatedDateLabel = formatGeneratedDate(new Date());
+  const signatureLocation = data.cidadeAssinatura.trim() || 'Cidade não informada';
   const contratadaSignatureLabel =
     data.contratadaNome.trim() || southMindlyContractInfo.nome;
 
@@ -256,7 +253,7 @@ export function ContractPreview({ data }: { data: ContratoData }) {
             <p>
               Fica eleito o foro da comarca de{' '}
               <span className="font-semibold text-[#111827]">
-                {data.foroCidadeUf}
+                {signatureLocation}
               </span>{' '}
               para dirimir quaisquer dúvidas oriundas deste contrato.
             </p>
@@ -264,10 +261,7 @@ export function ContractPreview({ data }: { data: ContratoData }) {
           </PreviewSection>
 
           <PreviewSection number="9" title="Anexo" avoidBreak={false}>
-            <p>
-              Escopo do projeto de reconstrução de website que integra este
-              contrato:
-            </p>
+            <p>{annexIntro}</p>
 
             <div className="grid items-start gap-3 md:grid-cols-2">
               {scopeSectionDefs.map((section) => {
@@ -300,10 +294,7 @@ export function ContractPreview({ data }: { data: ContratoData }) {
               Assinaturas
             </div>
             <div className="mt-3 text-[14px] text-[#374151]">
-              {signatureLocation},{' '}
-              <span className="font-medium capitalize text-[#111827]">
-                {generatedDateLabel}
-              </span>
+              {signatureLocation}
             </div>
 
             <div className="mt-20 grid gap-12 md:grid-cols-2">

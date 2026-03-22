@@ -5,16 +5,34 @@ import { useCallback, useEffect, useMemo, useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Field, SelectField, TextAreaField } from '@/components/ui/inputs';
 import { DatePicker } from '@/components/ui/inputs/date-picker';
-import { Eye, FilePlus2, Pencil, Printer } from 'lucide-react';
+import {
+  Eye,
+  FilePlus2,
+  FolderOpen,
+  Pencil,
+  Printer,
+  Save,
+} from 'lucide-react';
 
 import {
+  contractTemplates,
   contractPrintStyles,
+  createContratoData,
   defaultContratoData,
-  scopeSectionDefs,
+  getContractTemplate,
+  getScopeSectionDefs,
   southMindlyContractInfo,
 } from './constants';
+import { ContratosModal } from './contratos-modal';
 import { ContractPreview } from './preview';
-import { ClienteItem, ContratoData, ContratoProps } from './types';
+import {
+  ClienteItem,
+  ContratoData,
+  ContractListItem,
+  ContractResponse,
+  ContratoProps,
+  ContractTemplateId,
+} from './types';
 
 function SectionTitle({
   eyebrow,
@@ -44,8 +62,28 @@ function SectionTitle({
 
 export default function Contrato({ onBack }: ContratoProps) {
   const [data, setData] = useState<ContratoData>({ ...defaultContratoData });
+  const [contratoId, setContratoId] = useState<string | null>(null);
   const [activeTab, setActiveTab] = useState<'editor' | 'preview'>('editor');
   const [clientes, setClientes] = useState<ClienteItem[]>([]);
+  const [contratos, setContratos] = useState<ContractListItem[]>([]);
+  const [saving, setSaving] = useState(false);
+  const [statusMsg, setStatusMsg] = useState<string | null>(null);
+  const [creatingNewFromList, setCreatingNewFromList] = useState(false);
+  const [openingContratoId, setOpeningContratoId] = useState<string | null>(
+    null,
+  );
+  const [deletingContratoId, setDeletingContratoId] = useState<string | null>(
+    null,
+  );
+  const [listOpen, setListOpen] = useState(false);
+  const activeTemplate = useMemo(
+    () => getContractTemplate(data.templateId),
+    [data.templateId],
+  );
+  const scopeSectionDefs = useMemo(
+    () => getScopeSectionDefs(data.templateId),
+    [data.templateId],
+  );
 
   const selectedCliente = useMemo(
     () => clientes.find((cliente) => cliente.id === data.clienteId),
@@ -99,10 +137,170 @@ export default function Contrato({ onBack }: ContratoProps) {
     [clientes],
   );
 
+  const handleTemplateChange = useCallback(
+    (templateId: ContractTemplateId) => {
+      setData((current) => {
+        const nextData = createContratoData(templateId);
+
+        return {
+          ...nextData,
+          clienteId: current.clienteId,
+          contratanteNome: current.contratanteNome,
+          contratanteCnpj: current.contratanteCnpj,
+          contratanteEndereco: current.contratanteEndereco,
+        };
+      });
+    },
+    [],
+  );
+
   const resetDocument = useCallback(() => {
-    setData({ ...defaultContratoData });
+    setData((current) => {
+      const nextData = createContratoData(current.templateId);
+
+      return {
+        ...nextData,
+        clienteId: current.clienteId,
+        contratanteNome: current.contratanteNome,
+        contratanteCnpj: current.contratanteCnpj,
+        contratanteEndereco: current.contratanteEndereco,
+      };
+    });
+    setContratoId(null);
+    setStatusMsg(null);
     setActiveTab('editor');
   }, []);
+
+  const refreshList = useCallback(async () => {
+    const response = await fetch('/api/contratos', { cache: 'no-store' });
+    const payload = (await response.json().catch(() => ({}))) as {
+      items?: ContractListItem[];
+    };
+    setContratos(Array.isArray(payload.items) ? payload.items : []);
+  }, []);
+
+  const handleNew = useCallback(() => {
+    setData({ ...defaultContratoData });
+    setContratoId(null);
+    setStatusMsg(null);
+    setActiveTab('editor');
+  }, []);
+
+  const handleCreateNewFromList = useCallback(async () => {
+    setCreatingNewFromList(true);
+    setStatusMsg('Preparando novo contrato...');
+
+    try {
+      await new Promise<void>((resolve) => {
+        requestAnimationFrame(() => resolve());
+      });
+
+      handleNew();
+      setListOpen(false);
+    } finally {
+      setCreatingNewFromList(false);
+    }
+  }, [handleNew]);
+
+  const handleOpenSaved = useCallback(async (id: string) => {
+    try {
+      setOpeningContratoId(id);
+      setStatusMsg('Carregando contrato...');
+
+      const response = await fetch(`/api/contratos/${id}`, {
+        cache: 'no-store',
+      });
+      if (!response.ok) {
+        setStatusMsg('Erro ao carregar contrato');
+        return;
+      }
+
+      const payload = (await response.json().catch(() => null)) as ContractResponse;
+      if (!payload) {
+        setStatusMsg('Erro ao carregar contrato');
+        return;
+      }
+
+      setContratoId(payload.id);
+      setData(payload.contrato);
+      setListOpen(false);
+      setStatusMsg(null);
+      setActiveTab('editor');
+    } catch (error) {
+      if (error instanceof Error) {
+        setStatusMsg(error.message);
+        return;
+      }
+
+      setStatusMsg('Erro ao carregar contrato');
+    } finally {
+      setOpeningContratoId(null);
+    }
+  }, []);
+
+  const handleDeleteSaved = useCallback(
+    async (id: string) => {
+      setDeletingContratoId(id);
+      setStatusMsg('Excluindo contrato...');
+
+      try {
+        const response = await fetch(`/api/contratos/${id}`, {
+          method: 'DELETE',
+        });
+        if (!response.ok) {
+          setStatusMsg('Erro ao excluir contrato');
+          return;
+        }
+
+        if (contratoId === id) {
+          handleNew();
+        }
+
+        await refreshList();
+        setStatusMsg('Contrato excluído');
+        setTimeout(() => setStatusMsg(null), 2400);
+      } finally {
+        setDeletingContratoId(null);
+      }
+    },
+    [contratoId, handleNew, refreshList],
+  );
+
+  const handleSave = useCallback(async () => {
+    setSaving(true);
+    setStatusMsg(null);
+
+    try {
+      const url = contratoId ? `/api/contratos/${contratoId}` : '/api/contratos';
+      const method = contratoId ? 'PUT' : 'POST';
+      const response = await fetch(url, {
+        method,
+        headers: {
+          'content-type': 'application/json',
+        },
+        body: JSON.stringify({ contrato: data }),
+      });
+
+      const payload = (await response.json().catch(() => ({}))) as {
+        id?: string;
+        error?: string;
+      };
+
+      if (!response.ok) {
+        setStatusMsg(payload.error ?? 'Erro ao salvar contrato');
+        return;
+      }
+
+      if (payload.id) {
+        setContratoId(payload.id);
+      }
+
+      setStatusMsg(contratoId ? 'Contrato atualizado' : 'Contrato salvo');
+      window.setTimeout(() => setStatusMsg(null), 2400);
+    } finally {
+      setSaving(false);
+    }
+  }, [contratoId, data]);
 
   const handlePrint = useCallback(() => {
     setActiveTab('preview');
@@ -222,6 +420,19 @@ export default function Contrato({ onBack }: ContratoProps) {
             <Button
               type="button"
               variant="ghost"
+              onClick={() => {
+                setListOpen(true);
+                refreshList();
+              }}
+              className="h-auto rounded-lg border border-[#252A3A] bg-transparent px-3 py-1.5 text-[12px] font-medium text-[#9CA3AF] transition-all duration-200 hover:border-[#7C3AED44] hover:bg-transparent hover:text-[#7C3AED] sm:px-4.5 sm:text-[13px]"
+              title="Consultar contratos salvos"
+            >
+              <FolderOpen className="size-4" />
+              Contratos
+            </Button>
+            <Button
+              type="button"
+              variant="ghost"
               onClick={() => setActiveTab('editor')}
               className={`h-auto rounded-lg border-none px-3 py-1.5 text-[12px] font-medium transition-all duration-200 hover:bg-transparent sm:px-4 sm:text-[13px] ${
                 activeTab === 'editor'
@@ -254,14 +465,63 @@ export default function Contrato({ onBack }: ContratoProps) {
               <Printer className="size-4" />
               Imprimir
             </Button>
+            <Button
+              type="button"
+              variant="ghost"
+              onClick={handleSave}
+              disabled={saving}
+              className="h-auto rounded-lg border border-[#7C3AED44] bg-[#7C3AED18] px-3 py-1.5 text-[12px] font-medium text-[#7C3AED] transition-all duration-200 hover:bg-[#7C3AED33] hover:text-[#7C3AED] disabled:opacity-60 sm:px-4.5 sm:text-[13px]"
+            >
+              <Save className="size-4" />
+              {saving ? 'Salvando...' : contratoId ? 'Atualizar' : 'Salvar'}
+            </Button>
           </div>
         </div>
       </header>
+
+      {statusMsg ? (
+        <div className="border-b border-[#1E2130] bg-[#13161D] px-4 py-3 text-[12px] text-[#9CA3AF] print:hidden sm:px-6 lg:px-8">
+          {statusMsg}
+        </div>
+      ) : null}
+
+      <ContratosModal
+        open={listOpen}
+        contratos={contratos}
+        creatingNew={creatingNewFromList}
+        openingId={openingContratoId}
+        deletingId={deletingContratoId}
+        onClose={() => setListOpen(false)}
+        onNew={handleCreateNewFromList}
+        onOpenSaved={handleOpenSaved}
+        onDeleteSaved={handleDeleteSaved}
+      />
 
       <div className="flex-1 overflow-auto">
         {activeTab === 'editor' ? (
           <div className="grid min-h-[calc(100vh-60px)] grid-cols-1 lg:grid-cols-[360px_1fr]">
             <div className="overflow-y-auto border-b border-[#1E2130] bg-[#13161D] p-4 sm:p-5 lg:border-b-0 lg:border-r lg:p-[28px_24px]">
+              <SelectField
+                label="Modelo de contrato"
+                value={data.templateId}
+                onChange={handleTemplateChange}
+                options={contractTemplates.map((template) => ({
+                  value: template.id,
+                  label: template.label,
+                }))}
+                placeholder="Selecione o modelo"
+              />
+              <div className="mb-6 rounded-[20px] border border-[#252A3A] bg-[#13161D] p-4">
+                <div className="text-[10px] font-mono uppercase tracking-[0.12em] text-[#6B7280]">
+                  Modelo ativo
+                </div>
+                <div className="mt-2 text-[15px] font-semibold text-[#F3F4F6]">
+                  {activeTemplate.label}
+                </div>
+                <div className="mt-1 text-[12px] leading-5 text-[#8B93A7]">
+                  {activeTemplate.description}
+                </div>
+              </div>
               <SectionTitle
                 eyebrow="Documento"
                 title="Identificação do contrato"
@@ -371,15 +631,9 @@ export default function Contrato({ onBack }: ContratoProps) {
               <SectionTitle
                 eyebrow="Financeiro"
                 title="Dados de fechamento"
-                description="Defina foro, cidade de assinatura e os rótulos finais do documento."
+                description="Defina a cidade de assinatura e os rótulos finais do documento."
               />
 
-              <Field
-                label="Foro"
-                value={data.foroCidadeUf}
-                onChange={(value) => updateField('foroCidadeUf', value)}
-                placeholder="Ex: Porto Alegre/RS"
-              />
               <Field
                 label="Cidade da assinatura"
                 value={data.cidadeAssinatura}

@@ -1,6 +1,9 @@
 'use client';
 
+export type ContractTemplateId = 'website' | 'marketing-digital';
+
 export type ContratoData = {
+  templateId: ContractTemplateId;
   clienteId: string;
   contractTitle: string;
   projectTitle: string;
@@ -52,7 +55,6 @@ export type ContratoData = {
   entregaProjeto: string;
   direitosUsoPortfolio: string;
   disposicoesGerais: string;
-  foroCidadeUf: string;
   assinaturaContratanteLabel: string;
   assinaturaContratadaLabel: string;
   dataAssinatura: string;
@@ -61,6 +63,39 @@ export type ContratoData = {
 export interface ContratoProps {
   onBack: () => void;
 }
+
+export type ContractListItem = {
+  id: string;
+  title: string;
+  clientName: string;
+  subtitle: string;
+  templateId: ContractTemplateId;
+  templateLabel: string;
+  signatureCity: string;
+  updatedAt: string;
+  clienteId: string;
+};
+
+export type ContractResponse = {
+  id: string;
+  contrato: ContratoData;
+  updatedAt: string;
+} | null;
+
+export type ScopeSectionDef = {
+  key:
+    | 'scopeHome'
+    | 'scopeSobreNos'
+    | 'scopeCorpoClinico'
+    | 'scopeExames'
+    | 'scopeFaq'
+    | 'scopeNovidades'
+    | 'scopeContato'
+    | 'scopeProvaSocial'
+    | 'scopeMobile';
+  number: string;
+  title: string;
+};
 
 export type ClienteItem = {
   id: string;
