@@ -239,66 +239,69 @@ const marketingDigitalDefaults: ContratoData = {
   objectText:
     'O presente contrato tem como objeto a prestação de serviço em formato de consultoria e monitoramento de marketing, com referências institucionais da CONTRATANTE.',
   objectAnnexClause:
-    'O projeto contendo os serviços a serem desenvolvidos está anexado a este instrumento, sendo parte integrante deste contrato para todos os efeitos.',
+    'O projeto contendo os serviços a serem desenvolvidos, com a descrição dos entregáveis, limites operacionais e rotinas aplicáveis, está anexado a este instrumento, sendo parte integrante deste contrato para todos os efeitos.',
   objectStartClause:
-    'A prestação de serviços inicia com o briefing inicial e definição das datas de entrega.',
+    'A prestação de serviços inicia com o briefing inicial, liberação dos acessos necessários e definição das datas de entrega, ficando sua execução condicionada ao envio, pela CONTRATANTE, das informações e aprovações indispensáveis ao andamento das atividades.',
   dataInicioExecucao: '01/03/2026',
   paymentSummary:
     'O preço ajustado neste contrato será pago mensalmente, com vencimento no dia 15 de cada mês, sendo o primeiro vencimento em 15/03/2026.',
   paymentInstallmentClause:
     'Obriga-se a CONTRATANTE a pagar mensalmente o valor de R$ 500,00 (quinhentos reais), iniciando em 01/03/2026, pelo período de 6 (seis) meses, referente ao serviço contratado.',
   paymentRenewalClause:
-    'Após esse período, a renovação será automática. Em caso de cancelamento, a CONTRATANTE deverá avisar por escrito a SouthMindly com antecedência mínima de 30 (trinta) dias.',
+    'O contrato vigorará pelo período inicial de 6 (seis) meses, com renovação automática por iguais períodos. Em caso de cancelamento imotivado antes do término da vigência inicial, a CONTRATANTE deverá comunicar por escrito com antecedência mínima de 30 (trinta) dias e ficará sujeita ao pagamento de multa compensatória equivalente a 1 (uma) mensalidade vigente.',
   paymentDefaultClause:
-    'Caso a CONTRATANTE não cumpra com qualquer das obrigações referentes aos pagamentos, o projeto não terá continuação até a regularização dos valores em aberto.',
+    'Caso a CONTRATANTE não cumpra com qualquer das obrigações referentes aos pagamentos, a CONTRATADA poderá suspender total ou parcialmente a execução dos serviços, campanhas, publicações e atendimentos até a regularização integral dos valores em aberto, sem prejuízo da cobrança dos encargos previstos neste contrato.',
   paymentLateFeeClause:
     'O não pagamento por prazo superior a 10 (dez) dias do vencimento poderá acarretar multa moratória de 2% (dois por cento) sobre o valor devido, além de juros de 1% (um por cento) ao mês, calculados pro rata die.',
   rescisaoText:
-    'O presente contrato poderá ser considerado rescindido de pleno direito pela parte prejudicada, na ocorrência de descumprimento de qualquer de suas cláusulas, sem prejuízo da cobrança dos valores já vencidos e dos serviços já executados.',
+    'O presente contrato poderá ser considerado rescindido de pleno direito pela parte prejudicada, na ocorrência de descumprimento de qualquer de suas cláusulas, sem prejuízo da cobrança dos valores já vencidos, dos serviços já executados e da multa contratual aplicável. A ausência de resposta, aprovação ou envio de materiais pela CONTRATANTE por período superior a 5 (cinco) dias úteis autoriza a suspensão dos prazos de execução até a regularização da pendência, sem caracterizar inadimplemento da CONTRATADA.',
   generalRightsClause:
-    'Ficam assegurados à CONTRATANTE os direitos relativos ao projeto, sem que à CONTRATADA caiba qualquer direito nesse sentido, com exceção de rescisão ocasionada por falta de pagamento da CONTRATANTE.',
+    'Ficam assegurados à CONTRATANTE, após a quitação integral dos valores contratados, os direitos de uso dos materiais finais aprovados e entregues no âmbito deste contrato. Arquivos editáveis, estruturas internas de campanhas, templates, documentos estratégicos e demais materiais de trabalho da CONTRATADA não se presumem cedidos ou transferidos, salvo ajuste expresso entre as partes.',
   generalDelegationClause:
     'A CONTRATADA não poderá, em hipótese alguma, transferir ou delegar as atribuições e responsabilidades assumidas por força deste contrato, a não ser com prévia concordância da CONTRATANTE.',
   generalClosingClause:
     'E por assim estarem justos e contratados, assinam o presente instrumento em duas (02) vias de igual teor.',
   revisionDeliveryClause:
-    'A CONTRATADA se obriga a desenvolver o serviço objeto do contrato dentro das especificações aprovadas, utilizando os recursos previstos no projeto anexado a este instrumento.',
+    'A CONTRATADA se obriga a desenvolver o serviço objeto do contrato dentro das especificações aprovadas, utilizando os recursos previstos no projeto anexado a este instrumento. Estão incluídas até 2 (duas) rodadas de ajustes por entrega submetida à aprovação da CONTRATANTE, desde que compatíveis com o escopo originalmente contratado. A CONTRATANTE deverá apresentar suas aprovações ou solicitações de ajuste em até 2 (dois) dias úteis após cada envio; ultrapassado esse prazo, os cronogramas poderão ser reprogramados. Alterações adicionais, refações por mudança de direcionamento ou demandas não previstas no escopo poderão ser tratadas como serviço complementar, com revisão de prazo e valor.',
   scopeHome: [
     'Diagnóstico inicial da presença digital',
     'Definição de objetivos e metas de comunicação',
     'Planejamento editorial e calendário mensal',
+    'Definição das frentes de atuação contempladas no período contratado',
   ].join('\n'),
   scopeSobreNos: [
-    'Gestão dos perfis definidos em contrato',
-    'Publicação de conteúdos conforme cronograma',
-    'Monitoramento básico de interações',
+    'Gestão dos perfis e canais expressamente contemplados na contratação',
+    'Publicação de conteúdos conforme cronograma previamente aprovado',
+    'Monitoramento básico de interações e sinalização de demandas relevantes',
   ].join('\n'),
   scopeCorpoClinico: [
-    'Criação de legendas e copys',
-    'Sugestão de pautas e campanhas',
-    'Apoio na organização das informações da marca',
+    'Criação de legendas, copys e roteiros curtos conforme necessidade da operação',
+    'Sugestão de pautas, campanhas e linhas editoriais',
+    'Apoio na organização das informações da marca e dos materiais enviados',
   ].join('\n'),
   scopeExames: [
     'Desenvolvimento de artes estáticas e peças digitais',
     'Ajustes visuais conforme identidade da marca',
     'Entrega de materiais aprovados para publicação',
+    'Produção limitada aos formatos e volumes compatíveis com o plano contratado',
   ].join('\n'),
   scopeFaq: [
-    'Configuração e acompanhamento de campanhas, quando contratadas',
-    'Monitoramento de orçamento e performance',
-    'Sinalização de oportunidades de otimização',
+    'Configuração e acompanhamento de campanhas, quando expressamente contratadas',
+    'Monitoramento de orçamento, performance e execução técnica',
+    'Sinalização de oportunidades de otimização, sem garantia de resultado específico',
   ].join('\n'),
   scopeNovidades: [
-    'Envio de relatório periódico com indicadores principais',
-    'Apresentação de resultados e próximos passos',
+    'Envio de relatório mensal com os principais indicadores das ações executadas',
+    'Apresentação de resultados, aprendizados e próximos passos',
   ].join('\n'),
   scopeContato: [
-    'Canal de comunicação para aprovações e alinhamentos',
-    'Prazo de retorno conforme rotina operacional definida',
+    'Canal de comunicação para aprovações e alinhamentos operacionais',
+    'Atendimento realizado em dias úteis, de segunda a sexta-feira, em horário comercial',
+    'Prazo de retorno conforme rotina operacional definida, salvo demandas urgentes previamente justificadas',
   ].join('\n'),
   scopeProvaSocial: [
-    'Demandas não previstas dependerão de validação prévia',
-    'Serviços extras poderão ser orçados separadamente',
+    'Demandas não previstas dependerão de validação prévia da CONTRATADA',
+    'Serviços extras, acréscimos de volume, novas frentes ou refações substanciais poderão ser orçados separadamente',
   ].join('\n'),
   scopeMobile: [
     'Ajustes de estratégia com base em dados e sazonalidades',
@@ -307,10 +310,14 @@ const marketingDigitalDefaults: ContratoData = {
   responsabilidadesContratante: [
     'Fornecer as características visuais e todo o material complementar, como textos, fotos, vídeos e logomarca, que sejam necessários à elaboração do projeto',
     'Assumir responsabilidade por todo conteúdo divulgado pela CONTRATADA',
+    'Aprovar ou solicitar ajustes dos materiais enviados em até 2 (dois) dias úteis, a contar de cada encaminhamento',
+    'Providenciar os dados necessários para a execução dos serviços, podendo obtê-los mediante criação de credencial na plataforma correspondente ou por contato com o gerente do banco, quando aplicável',
+    'Disponibilizar acessos, informações técnicas e verbas de mídia, quando aplicáveis, dentro dos prazos necessários à operação',
   ].join('\n'),
   responsabilidadesContratada: [
     'Desenvolver o serviço objeto do contrato dentro das especificações previstas no projeto anexado',
     'Entregar o projeto em conformidade com o orçamento apresentado e aprovado pela CONTRATANTE',
+    'Executar as rotinas contratadas dentro do horário operacional e dos limites do escopo aprovado',
   ].join('\n'),
 };
 
