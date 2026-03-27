@@ -271,6 +271,10 @@ export default function Contrato({ onBack }: ContratoProps) {
     setStatusMsg(null);
 
     try {
+      const sanitizedData =
+        data.templateId === 'marketing-digital'
+          ? { ...data, scopeFaq: '' }
+          : data;
       const url = contratoId ? `/api/contratos/${contratoId}` : '/api/contratos';
       const method = contratoId ? 'PUT' : 'POST';
       const response = await fetch(url, {
@@ -278,7 +282,7 @@ export default function Contrato({ onBack }: ContratoProps) {
         headers: {
           'content-type': 'application/json',
         },
-        body: JSON.stringify({ contrato: data }),
+        body: JSON.stringify({ contrato: sanitizedData }),
       });
 
       const payload = (await response.json().catch(() => ({}))) as {
@@ -738,7 +742,7 @@ export default function Contrato({ onBack }: ContratoProps) {
               />
 
               <SectionTitle
-                eyebrow="Cláusulas 3 a 8"
+                eyebrow="Cláusulas 3 a 7"
                 title="Obrigações, revisões, rescisão e disposições gerais"
                 description="Ajuste as responsabilidades das partes, a política de revisões e as cláusulas finais do contrato."
               />
@@ -797,7 +801,7 @@ export default function Contrato({ onBack }: ContratoProps) {
               <SectionTitle
                 eyebrow="Anexo"
                 title="Escopo do projeto"
-                description="O anexo segue o escopo do website e será impresso ao final do contrato."
+                description="Os itens abaixo compõem o anexo que será impresso ao final do contrato."
               />
 
               <div className="grid gap-4 xl:grid-cols-2">

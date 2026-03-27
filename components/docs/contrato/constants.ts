@@ -60,6 +60,43 @@ export const contractPrintStyles = `
       box-shadow: none !important;
       border-color: #D1D5DB !important;
     }
+
+    #contract-print-root .contract-parties-grid,
+    #contract-print-root .contract-annex-grid,
+    #contract-print-root .contract-signatures-grid {
+      grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+    }
+
+    #contract-print-root .contract-parties-grid {
+      column-gap: 5mm !important;
+      row-gap: 4mm !important;
+    }
+
+    #contract-print-root .contract-annex-grid {
+      column-gap: 4mm !important;
+      row-gap: 3mm !important;
+    }
+
+    #contract-print-root .contract-signatures-grid {
+      column-gap: 9mm !important;
+      row-gap: 6mm !important;
+    }
+
+    #contract-print-root .contract-signature {
+      min-width: 0 !important;
+    }
+
+    #contract-print-root .contract-signature-line {
+      width: 100% !important;
+      border-top: 1.2pt solid #111827 !important;
+      height: 0 !important;
+    }
+
+    #contract-print-root .contract-signature-name,
+    #contract-print-root .contract-signature-label {
+      overflow-wrap: anywhere;
+      word-break: break-word;
+    }
   }
 `;
 
@@ -88,17 +125,16 @@ const marketingDigitalScopeSections = [
   },
   { key: 'scopeCorpoClinico', number: '2.3', title: 'Criação de Conteúdo' },
   { key: 'scopeExames', number: '2.4', title: 'Design e Criativos' },
-  { key: 'scopeFaq', number: '2.5', title: 'Tráfego Pago' },
-  { key: 'scopeNovidades', number: '2.6', title: 'Relatórios' },
-  { key: 'scopeContato', number: '2.7', title: 'Atendimento e Aprovações' },
+  { key: 'scopeNovidades', number: '2.5', title: 'Relatórios' },
+  { key: 'scopeContato', number: '2.6', title: 'Atendimento e Aprovações' },
   {
     key: 'scopeProvaSocial',
-    number: '2.8',
+    number: '2.7',
     title: 'Escopo Extra e Demandas Pontuais',
   },
   {
     key: 'scopeMobile',
-    number: '2.9',
+    number: '2.8',
     title: 'Otimizações e Evolução Contínua',
   },
 ] as const satisfies ReadonlyArray<ScopeSectionDef>;
@@ -285,11 +321,7 @@ const marketingDigitalDefaults: ContratoData = {
     'Entrega de materiais aprovados para publicação',
     'Produção limitada aos formatos e volumes compatíveis com o plano contratado',
   ].join('\n'),
-  scopeFaq: [
-    'Configuração e acompanhamento de campanhas, quando expressamente contratadas',
-    'Monitoramento de orçamento, performance e execução técnica',
-    'Sinalização de oportunidades de otimização, sem garantia de resultado específico',
-  ].join('\n'),
+  scopeFaq: '',
   scopeNovidades: [
     'Envio de relatório mensal com os principais indicadores das ações executadas',
     'Apresentação de resultados, aprendizados e próximos passos',

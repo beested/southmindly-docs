@@ -47,12 +47,12 @@ function PartyCard({
 }
 
 function PreviewSection({
-  number,
+  label,
   title,
   children,
   avoidBreak = true,
 }: {
-  number: string;
+  label?: string;
   title: string;
   children: React.ReactNode;
   avoidBreak?: boolean;
@@ -60,9 +60,11 @@ function PreviewSection({
   return (
     <section className={avoidBreak ? 'break-inside-avoid' : ''}>
       <div className="border-b border-[#E5E7EB] pb-2">
-        <div className="text-[11px] font-mono uppercase tracking-[0.16em] text-[#6B7280]">
-          Cláusula {number}
-        </div>
+        {label ? (
+          <div className="text-[11px] font-mono uppercase tracking-[0.16em] text-[#6B7280]">
+            {label}
+          </div>
+        ) : null}
         <h2 className="mt-1 text-[18px] font-semibold text-[#111827]">
           {title}
         </h2>
@@ -108,7 +110,7 @@ export function ContractPreview({ data }: { data: ContratoData }) {
           </div>
         </header>
 
-        <section className="mt-8 grid gap-4 md:grid-cols-2">
+        <section className="contract-parties-grid mt-8 grid gap-4 print:grid-cols-2 md:grid-cols-2">
           <PartyCard
             title="Contratante"
             name={data.contratanteNome}
@@ -129,7 +131,7 @@ export function ContractPreview({ data }: { data: ContratoData }) {
         </div>
 
         <div className="mt-10 space-y-8">
-          <PreviewSection number="1" title="Das Partes">
+          <PreviewSection label="Partes" title="Das Partes">
             <p>
               As partes acima identificadas celebram o presente instrumento,
               reconhecendo-se mutuamente aptas para contratar e assumir as
@@ -137,7 +139,7 @@ export function ContractPreview({ data }: { data: ContratoData }) {
             </p>
           </PreviewSection>
 
-          <PreviewSection number="2" title="Objeto do Contrato">
+          <PreviewSection label="Cláusula 1" title="Objeto do Contrato">
             <p>
               <span className="font-semibold text-[#111827]">
                 CLÁUSULA PRIMEIRA:
@@ -161,7 +163,7 @@ export function ContractPreview({ data }: { data: ContratoData }) {
             </p>
           </PreviewSection>
 
-          <PreviewSection number="3" title="Pagamento">
+          <PreviewSection label="Cláusula 2" title="Pagamento">
             <p>
               <span className="font-semibold text-[#111827]">
                 CLÁUSULA SEGUNDA:
@@ -194,7 +196,7 @@ export function ContractPreview({ data }: { data: ContratoData }) {
             </p>
           </PreviewSection>
 
-          <PreviewSection number="4" title="Obrigações da Contratada">
+          <PreviewSection label="Cláusula 3" title="Obrigações da Contratada">
             <p>
               <span className="font-semibold text-[#111827]">
                 CLÁUSULA TERCEIRA:
@@ -210,7 +212,7 @@ export function ContractPreview({ data }: { data: ContratoData }) {
             </ul>
           </PreviewSection>
 
-          <PreviewSection number="5" title="Obrigações da Contratante">
+          <PreviewSection label="Cláusula 4" title="Obrigações da Contratante">
             <p>
               <span className="font-semibold text-[#111827]">
                 CLÁUSULA QUARTA:
@@ -224,7 +226,7 @@ export function ContractPreview({ data }: { data: ContratoData }) {
             </ul>
           </PreviewSection>
 
-          <PreviewSection number="6" title="Entregas e Revisões">
+          <PreviewSection label="Cláusula 5" title="Entregas e Revisões">
             <p>
               <span className="font-semibold text-[#111827]">
                 CLÁUSULA QUINTA:
@@ -233,7 +235,7 @@ export function ContractPreview({ data }: { data: ContratoData }) {
             </p>
           </PreviewSection>
 
-          <PreviewSection number="7" title="Da Rescisão">
+          <PreviewSection label="Cláusula 6" title="Da Rescisão">
             <p>
               <span className="font-semibold text-[#111827]">
                 CLÁUSULA SEXTA:
@@ -242,7 +244,7 @@ export function ContractPreview({ data }: { data: ContratoData }) {
             </p>
           </PreviewSection>
 
-          <PreviewSection number="8" title="Disposições Gerais">
+          <PreviewSection label="Cláusula 7" title="Disposições Gerais">
             <p>
               <span className="font-semibold text-[#111827]">
                 CLÁUSULA SÉTIMA:
@@ -260,17 +262,17 @@ export function ContractPreview({ data }: { data: ContratoData }) {
             <p>{data.generalClosingClause}</p>
           </PreviewSection>
 
-          <PreviewSection number="9" title="Anexo" avoidBreak={false}>
+          <PreviewSection label="Anexo" title="Anexo" avoidBreak={false}>
             <p>{annexIntro}</p>
 
-            <div className="grid items-start gap-3 md:grid-cols-2">
+            <div className="contract-annex-grid grid items-stretch gap-3 print:grid-cols-2 md:grid-cols-2">
               {scopeSectionDefs.map((section) => {
                 const items = splitLines(data[section.key] as string);
 
                 return (
                   <div
                     key={section.number}
-                    className="contract-annex-card break-inside-avoid rounded-[18px] border border-[#E5E7EB] bg-[#FAFAFA] px-4 py-3"
+                    className="contract-annex-card break-inside-avoid flex h-full flex-col rounded-[18px] border border-[#E5E7EB] bg-[#FAFAFA] px-4 py-3"
                   >
                     <div className="text-[12px] font-mono uppercase tracking-[0.12em] text-[#6B7280]">
                       {section.number}
@@ -278,7 +280,7 @@ export function ContractPreview({ data }: { data: ContratoData }) {
                     <div className="mt-1 text-[14px] font-semibold text-[#111827]">
                       {section.title}
                     </div>
-                    <div className="mt-2 text-[13px] leading-6 text-[#374151]">
+                    <div className="mt-2 flex-1 text-[13px] leading-6 text-[#374151]">
                       {items.length > 0
                         ? items.join(' • ')
                         : 'Escopo não informado.'}
@@ -289,31 +291,31 @@ export function ContractPreview({ data }: { data: ContratoData }) {
             </div>
           </PreviewSection>
 
-          <div className=" rounded-[30px] border border-[#D1D5DB] bg-[linear-gradient(180deg,#FFFFFF_0%,#F8FAFC_100%)] px-6 py-2 sm:px-8 sm:py-5">
+          <div className="contract-signatures-section break-inside-avoid rounded-[30px] border border-[#D1D5DB] bg-[linear-gradient(180deg,#FFFFFF_0%,#F8FAFC_100%)] px-6 py-2 sm:px-8 sm:py-5">
             <div className="text-[11px] font-mono uppercase tracking-[0.18em] text-[#6B7280]">
               Assinaturas
             </div>
-            <div className="mt-3 text-[14px] text-[#374151]">
+            <div className="mt-3 text-[14px] text-center text-[#374151]">
               {signatureLocation}
             </div>
 
-            <div className="mt-20 grid gap-12 md:grid-cols-2">
-              <div className="flex flex-col">
-                <div className="h-px bg-[#111827]" />
-                <div className="mt-4 text-[15px] font-semibold text-[#111827]">
+            <div className="contract-signatures-grid mt-20 grid gap-12 print:grid-cols-2 md:grid-cols-2">
+              <div className="contract-signature flex min-w-0 flex-col items-center text-center">
+                <div className="contract-signature-line w-full max-w-[320px]" />
+                <div className="contract-signature-name mt-4 text-[15px] font-semibold leading-snug text-[#111827] break-words">
                   {data.contratanteNome}
                 </div>
-                <div className="mt-1 text-[11px] font-mono uppercase tracking-[0.14em] text-[#6B7280]">
+                <div className="contract-signature-label mt-1 text-[11px] font-mono uppercase tracking-[0.14em] text-[#6B7280] break-words">
                   {data.assinaturaContratanteLabel}
                 </div>
               </div>
 
-              <div className="flex flex-col">
-                <div className="h-px bg-[#111827]" />
-                <div className="mt-4 text-[15px] font-semibold text-[#111827]">
+              <div className="contract-signature flex min-w-0 flex-col items-center text-center">
+                <div className="contract-signature-line w-full max-w-[320px]" />
+                <div className="contract-signature-name mt-4 text-[15px] font-semibold leading-snug text-[#111827] break-words">
                   {contratadaSignatureLabel}
                 </div>
-                <div className="mt-1 text-[11px] font-mono uppercase tracking-[0.14em] text-[#6B7280]">
+                <div className="contract-signature-label mt-1 text-[11px] font-mono uppercase tracking-[0.14em] text-[#6B7280] break-words">
                   {data.assinaturaContratadaLabel}
                 </div>
               </div>
