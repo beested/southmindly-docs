@@ -1,6 +1,6 @@
 'use client';
 
-import { ContratoData, ContractTemplateId, ScopeSectionDef } from './types';
+import { ContractTemplateId, ContratoData, ScopeSectionDef } from './types';
 
 export const southMindlyContractInfo = {
   nome: 'SouthMindly',
@@ -195,7 +195,7 @@ const websiteDefaults: ContratoData = {
   paymentInstallmentClause:
     'Obriga-se a CONTRATANTE a pagar o valor total de R$ 2.200,00 (dois mil e duzentos reais), podendo realizar o pagamento à vista via PIX ou boleto, ou de forma parcelada com entrada de 30% e 3 parcelas mensais.',
   paymentRenewalClause:
-    'Por se tratar de um projeto fechado de reconstrução de website, não há renovação automática. Qualquer nova etapa, manutenção ou ampliação será objeto de nova contratação.',
+    'Por se tratar de um projeto fechado de reconstrução de website, não há renovação automática. Qualquer nova etapa, manutenção técnica pós-entrega ou ampliação será objeto de manutenção avulsa, ao valor de R$ 100,00 (cem reais) por hora técnica. Os custos de terceiros necessários à operação ou continuidade do website, incluindo hospedagem, domínio, e serviços equivalentes, não estão incluídos neste contrato e serão de responsabilidade exclusiva da CONTRATANTE.',
   paymentDefaultClause:
     'Caso a CONTRATANTE não cumpra com as obrigações de pagamento, a CONTRATADA poderá suspender a continuidade do projeto até a regularização dos valores em aberto.',
   paymentLateFeeClause:
@@ -209,7 +209,7 @@ const websiteDefaults: ContratoData = {
   generalClosingClause:
     'E por assim estarem justas e contratadas, as partes assinam o presente instrumento em duas vias de igual teor.',
   revisionDeliveryClause:
-    'Estão incluídas até 2 (duas) rodadas de ajustes por etapa entregue, desde que respeitado o escopo aprovado inicialmente. Solicitações adicionais ou alterações fora do escopo poderão ser tratadas como serviço complementar, com eventual revisão de prazo e valor.',
+    'Estão incluídas até 2 (duas) rodadas de ajustes por etapa entregue, desde que respeitado o escopo aprovado inicialmente. Após o go-live, a CONTRATADA prestará suporte técnico limitado, pelo prazo de 30 (trinta) dias corridos, exclusivamente para correção de bugs ou falhas de desenvolvimento relacionadas ao escopo entregue. Solicitações adicionais, alterações fora do escopo ou manutenções evolutivas poderão ser tratadas como serviço complementar, com eventual revisão de prazo e valor.',
   scopeHome: [
     'Reestruturação com foco institucional',
     'Destaque para diferenciais da clínica',
@@ -258,6 +258,7 @@ const websiteDefaults: ContratoData = {
     'Fornecer textos, imagens e informações necessárias',
     'Aprovar etapas dentro dos prazos acordados',
     'Indicar responsável pelo acompanhamento do projeto',
+    'Arcar com os custos e renovações de domínio, hospedagem, licenças e serviços necessários ao website',
   ].join('\n'),
   responsabilidadesContratada: [
     'Executar o projeto conforme escopo definido',
@@ -357,15 +358,18 @@ export const contractTemplates: readonly ContractTemplateDefinition[] = [
   {
     id: 'website',
     label: 'Website',
-    description: 'Contrato voltado para reconstrução e desenvolvimento de site.',
-    annexIntro: 'Escopo do projeto de reconstrução de website que integra este contrato:',
+    description:
+      'Contrato voltado para reconstrução e desenvolvimento de site.',
+    annexIntro:
+      'Escopo do projeto de reconstrução de website que integra este contrato:',
     scopeSections: websiteScopeSections,
     defaults: websiteDefaults,
   },
   {
     id: 'marketing-digital',
     label: 'Marketing digital',
-    description: 'Contrato recorrente para assessoria e operação de marketing digital.',
+    description:
+      'Contrato recorrente para assessoria e operação de marketing digital.',
     annexIntro:
       'Escopo operacional de marketing digital que integra este contrato:',
     scopeSections: marketingDigitalScopeSections,
@@ -495,6 +499,8 @@ export function getAnnexIntro(templateId: ContractTemplateId) {
   return getContractTemplate(templateId).annexIntro;
 }
 
-export function createContratoData(templateId: ContractTemplateId): ContratoData {
+export function createContratoData(
+  templateId: ContractTemplateId,
+): ContratoData {
   return { ...getContractTemplate(templateId).defaults };
 }
