@@ -5,7 +5,8 @@ import { ContractTemplateId, ContratoData, ScopeSectionDef } from './types';
 export const southMindlyContractInfo = {
   nome: 'SouthMindly',
   cnpj: '19.618.599/0001-50',
-  endereco: 'Rua Marcílio Machado da Silveira, 95059-790',
+  endereco:
+    'Rua Marcílio Machado da Silveira, 334 - Serrano, Caxias do Sul/RS - CEP 95059-790',
 } as const;
 
 export const contractPrintStyles = `
@@ -285,7 +286,7 @@ const marketingDigitalDefaults: ContratoData = {
   paymentInstallmentClause:
     'Obriga-se a CONTRATANTE a pagar mensalmente o valor de R$ 500,00 (quinhentos reais), iniciando em 01/03/2026, pelo período de 6 (seis) meses, referente ao serviço contratado.',
   paymentRenewalClause:
-    'O contrato vigorará pelo período inicial de 6 (seis) meses, com renovação automática por iguais períodos. Em caso de cancelamento imotivado antes do término da vigência inicial, a CONTRATANTE deverá comunicar por escrito com antecedência mínima de 30 (trinta) dias e ficará sujeita ao pagamento de multa compensatória equivalente a 1 (uma) mensalidade vigente.',
+    'O contrato vigorará pelo período mínimo inicial de 6 (seis) meses, com renovação automática por iguais períodos, salvo manifestação escrita em sentido contrário com antecedência mínima de 30 (trinta) dias. Os valores contratados poderão ser reajustados anualmente com base na variação acumulada do IPCA, ou por outro índice que venha a ser acordado entre as partes. Em caso de rescisão imotivada antes do término da vigência inicial, a CONTRATANTE ficará sujeita ao pagamento de multa compensatória equivalente a 50% (cinquenta por cento) do valor restante do contrato até o encerramento do prazo mínimo.',
   paymentDefaultClause:
     'Caso a CONTRATANTE não cumpra com qualquer das obrigações referentes aos pagamentos, a CONTRATADA poderá suspender total ou parcialmente a execução dos serviços, campanhas, publicações e atendimentos até a regularização integral dos valores em aberto, sem prejuízo da cobrança dos encargos previstos neste contrato.',
   paymentLateFeeClause:
@@ -293,13 +294,13 @@ const marketingDigitalDefaults: ContratoData = {
   rescisaoText:
     'O presente contrato poderá ser considerado rescindido de pleno direito pela parte prejudicada, na ocorrência de descumprimento de qualquer de suas cláusulas, sem prejuízo da cobrança dos valores já vencidos, dos serviços já executados e da multa contratual aplicável. A ausência de resposta, aprovação ou envio de materiais pela CONTRATANTE por período superior a 5 (cinco) dias úteis autoriza a suspensão dos prazos de execução até a regularização da pendência, sem caracterizar inadimplemento da CONTRATADA.',
   generalRightsClause:
-    'Ficam assegurados à CONTRATANTE, após a quitação integral dos valores contratados, os direitos de uso dos materiais finais aprovados e entregues no âmbito deste contrato. Arquivos editáveis, estruturas internas de campanhas, templates, documentos estratégicos e demais materiais de trabalho da CONTRATADA não se presumem cedidos ou transferidos, salvo ajuste expresso entre as partes.',
+    'Ficam assegurados à CONTRATANTE, após a quitação integral dos valores contratados, os direitos de uso dos materiais finais aprovados e entregues no âmbito deste contrato. Arquivos editáveis, estruturas internas de campanhas, templates, documentos estratégicos e demais materiais de trabalho da CONTRATADA não se presumem cedidos ou transferidos, salvo ajuste expresso entre as partes. A CONTRATADA poderá utilizar os materiais produzidos para portfólio, apresentação comercial e divulgação de seus serviços, salvo manifestação contrária da CONTRATANTE por escrito.',
   generalDelegationClause:
-    'A CONTRATADA não poderá, em hipótese alguma, transferir ou delegar as atribuições e responsabilidades assumidas por força deste contrato, a não ser com prévia concordância da CONTRATANTE.',
+    'A CONTRATADA não poderá transferir integralmente as obrigações assumidas por força deste contrato sem anuência prévia da CONTRATANTE. A CONTRATADA não garante resultados específicos, tais como vendas, leads, alcance, crescimento de audiência ou faturamento, por dependerem de fatores externos alheios à sua atuação exclusiva.',
   generalClosingClause:
     'E por assim estarem justos e contratados, assinam o presente instrumento em duas (02) vias de igual teor.',
   revisionDeliveryClause:
-    'A CONTRATADA se obriga a desenvolver o serviço objeto do contrato dentro das especificações aprovadas, utilizando os recursos previstos no projeto anexado a este instrumento. Estão incluídas até 2 (duas) rodadas de ajustes por entrega submetida à aprovação da CONTRATANTE, desde que compatíveis com o escopo originalmente contratado. A CONTRATANTE deverá apresentar suas aprovações ou solicitações de ajuste em até 2 (dois) dias úteis após cada envio; ultrapassado esse prazo, os cronogramas poderão ser reprogramados. Alterações adicionais, refações por mudança de direcionamento ou demandas não previstas no escopo poderão ser tratadas como serviço complementar, com revisão de prazo e valor.',
+    'A CONTRATADA executará os serviços dentro das especificações aprovadas e dos limites operacionais previstos no projeto anexado a este instrumento.  A CONTRATANTE deverá apresentar suas aprovações ou solicitações de ajuste em até 2 (dois) dias úteis após cada envio; ultrapassado esse prazo, os cronogramas poderão ser reprogramados. Não estão incluídos neste contrato, salvo ajuste expresso e contratação específica, serviços de tráfego pago, impulsionamentos, produção audiovisual, deslocamentos presenciais, contratação de fornecedores terceiros e demais demandas não previstas no escopo. Alterações adicionais, refações por mudança de direcionamento ou demandas extras poderão ser tratadas como serviço complementar, com revisão de prazo e valor.',
   scopeHome: [
     'Diagnóstico inicial da presença digital',
     'Definição de objetivos e metas de comunicação',
@@ -330,11 +331,11 @@ const marketingDigitalDefaults: ContratoData = {
   scopeContato: [
     'Canal de comunicação para aprovações e alinhamentos operacionais',
     'Atendimento realizado em dias úteis, de segunda a sexta-feira, em horário comercial',
-    'Prazo de retorno conforme rotina operacional definida, salvo demandas urgentes previamente justificadas',
+    'Prazo de resposta de até 24 (vinte e quatro) horas úteis, salvo demandas urgentes previamente justificadas e alinhadas entre as partes',
   ].join('\n'),
   scopeProvaSocial: [
     'Demandas não previstas dependerão de validação prévia da CONTRATADA',
-    'Serviços extras, acréscimos de volume, novas frentes ou refações substanciais poderão ser orçados separadamente',
+    'Não estão incluídos, salvo contratação específica, serviços de tráfego pago, impulsionamentos, produção audiovisual, deslocamentos, contratação de influenciadores, fornecedores terceiros e outras demandas extras',
   ].join('\n'),
   scopeMobile: [
     'Ajustes de estratégia com base em dados e sazonalidades',
@@ -348,9 +349,9 @@ const marketingDigitalDefaults: ContratoData = {
     'Disponibilizar acessos, informações técnicas e verbas de mídia, quando aplicáveis, dentro dos prazos necessários à operação',
   ].join('\n'),
   responsabilidadesContratada: [
-    'Desenvolver o serviço objeto do contrato dentro das especificações previstas no projeto anexado',
-    'Entregar o projeto em conformidade com o orçamento apresentado e aprovado pela CONTRATANTE',
-    'Executar as rotinas contratadas dentro do horário operacional e dos limites do escopo aprovado',
+    'Executar as rotinas contratadas conforme o escopo, cronograma e materiais aprovados',
+    'Zelar pela qualidade técnica e estratégica das entregas compatíveis com o plano contratado',
+    'Realizar o atendimento em dias úteis, em horário comercial, com prazo de resposta de até 24 (vinte e quatro) horas úteis',
   ].join('\n'),
 };
 
