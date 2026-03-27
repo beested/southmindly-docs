@@ -2,6 +2,7 @@
 
 import {
   getAnnexIntro,
+  getScopeFieldValue,
   getScopeSectionDefs,
   southMindlyContractInfo,
 } from './constants';
@@ -79,6 +80,10 @@ function PreviewSection({
 export function ContractPreview({ data }: { data: ContratoData }) {
   const scopeSectionDefs = getScopeSectionDefs(data.templateId);
   const annexIntro = getAnnexIntro(data.templateId);
+  const websiteDeliveryDeadlineText =
+    data.templateId === 'website' && data.prazoTotal
+      ? ` Prazo estimado de entrega: ${data.prazoTotal}.`
+      : '';
   const responsabilidadesContratante = splitLines(
     data.responsabilidadesContratante,
   );
@@ -160,6 +165,7 @@ export function ContractPreview({ data }: { data: ContratoData }) {
               {data.dataInicioExecucao
                 ? ` Início previsto em ${data.dataInicioExecucao}.`
                 : ''}
+              {websiteDeliveryDeadlineText}
             </p>
           </PreviewSection>
 
@@ -267,7 +273,7 @@ export function ContractPreview({ data }: { data: ContratoData }) {
 
             <div className="contract-annex-grid grid items-stretch gap-3 print:grid-cols-2 md:grid-cols-2">
               {scopeSectionDefs.map((section) => {
-                const items = splitLines(data[section.key] as string);
+                const items = splitLines(getScopeFieldValue(data, section.key));
 
                 return (
                   <div

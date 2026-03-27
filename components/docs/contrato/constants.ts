@@ -243,7 +243,7 @@ const websiteDefaults: ContratoData = {
   ].join('\n'),
   scopeContato: [
     'Ajuste de comunicação',
-    'Integração com WhatsApp com mensagem personalizada',
+    'Link para WhatsApp com mensagem personalizada pré-preenchida',
   ].join('\n'),
   scopeProvaSocial: [
     'Inserção de depoimentos',
@@ -375,6 +375,35 @@ export const contractTemplates: readonly ContractTemplateDefinition[] = [
 
 export const defaultContratoData = websiteDefaults;
 
+function mergeTextLines(...values: string[]) {
+  const uniqueLines = new Set<string>();
+
+  for (const value of values) {
+    for (const line of value.split('\n')) {
+      const normalized = line.trim();
+      if (normalized) {
+        uniqueLines.add(normalized);
+      }
+    }
+  }
+
+  return Array.from(uniqueLines).join('\n');
+}
+
+function normalizeWebsiteScopeValue(
+  key: ScopeSectionDef['key'],
+  value: string,
+) {
+  if (key !== 'scopeContato') {
+    return value;
+  }
+
+  return value.replace(
+    'Integração com WhatsApp com mensagem personalizada',
+    'Link para WhatsApp com mensagem personalizada pré-preenchida',
+  );
+}
+
 export function getContractTemplate(templateId: ContractTemplateId) {
   return (
     contractTemplates.find((template) => template.id === templateId) ??
@@ -382,8 +411,84 @@ export function getContractTemplate(templateId: ContractTemplateId) {
   );
 }
 
+export function getScopeFieldValue(
+  data: ContratoData,
+  key: ScopeSectionDef['key'],
+) {
+  if (data.templateId === 'website' && key === 'scopeSobreNos') {
+    return mergeTextLines(data.scopeSobreNos, data.scopeCorpoClinico);
+  }
+
+  const value = data[key] as string;
+
+  return data.templateId === 'website'
+    ? normalizeWebsiteScopeValue(key, value)
+    : value;
+}
+
+export function sanitizeContratoData(data: ContratoData): ContratoData {
+  const nextData =
+    data.templateId === 'website'
+      ? {
+          ...data,
+          scopeSobreNos: getScopeFieldValue(data, 'scopeSobreNos'),
+          scopeContato: getScopeFieldValue(data, 'scopeContato'),
+          scopeCorpoClinico: '',
+        }
+      : data;
+
+  return nextData.templateId === 'marketing-digital'
+    ? { ...nextData, scopeFaq: '' }
+    : nextData;
+}
+
 export function getScopeSectionDefs(templateId: ContractTemplateId) {
-  return getContractTemplate(templateId).scopeSections;
+  const scopeSections = getContractTemplate(templateId).scopeSections;
+
+  if (templateId !== 'website') {
+    return scopeSections;
+  }
+
+  return scopeSections
+    .filter((section) => section.key !== 'scopeCorpoClinico')
+    .map((section) => {
+      if (section.key === 'scopeSobreNos') {
+        return {
+          ...section,
+          title: 'Página "Sobre Nós" e Corpo Clínico',
+        };
+      }
+
+      if (section.key === 'scopeNovidades') {
+        return {
+          ...section,
+          title: 'Seção de Notícias',
+          number: '2.5',
+        };
+      }
+
+      if (section.key === 'scopeExames') {
+        return { ...section, number: '2.3' };
+      }
+
+      if (section.key === 'scopeFaq') {
+        return { ...section, number: '2.4' };
+      }
+
+      if (section.key === 'scopeContato') {
+        return { ...section, number: '2.6' };
+      }
+
+      if (section.key === 'scopeProvaSocial') {
+        return { ...section, number: '2.7' };
+      }
+
+      if (section.key === 'scopeMobile') {
+        return { ...section, number: '2.8' };
+      }
+
+      return section;
+    });
 }
 
 export function getAnnexIntro(templateId: ContractTemplateId) {

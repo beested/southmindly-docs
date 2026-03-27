@@ -20,7 +20,9 @@ import {
   createContratoData,
   defaultContratoData,
   getContractTemplate,
+  getScopeFieldValue,
   getScopeSectionDefs,
+  sanitizeContratoData,
   southMindlyContractInfo,
 } from './constants';
 import { ContratosModal } from './contratos-modal';
@@ -271,10 +273,7 @@ export default function Contrato({ onBack }: ContratoProps) {
     setStatusMsg(null);
 
     try {
-      const sanitizedData =
-        data.templateId === 'marketing-digital'
-          ? { ...data, scopeFaq: '' }
-          : data;
+      const sanitizedData = sanitizeContratoData(data);
       const url = contratoId ? `/api/contratos/${contratoId}` : '/api/contratos';
       const method = contratoId ? 'PUT' : 'POST';
       const response = await fetch(url, {
@@ -690,16 +689,32 @@ export default function Contrato({ onBack }: ContratoProps) {
                 onChange={(value) => updateField('objectStartClause', value)}
                 rows={3}
               />
-              <div className="mb-4">
-                <label className="mb-1.5 block text-[10px] font-mono uppercase tracking-[0.12em] text-[#6B7280]">
-                  Data de início da execução
-                </label>
-                <DatePicker
-                  value={data.dataInicioExecucao}
-                  onChange={(value) => updateField('dataInicioExecucao', value)}
-                  placeholder="dd/mm/aaaa"
-                  accentColor="#7C3AED"
-                />
+              <div
+                className={`grid gap-4 ${
+                  data.templateId === 'website' ? 'md:grid-cols-2' : ''
+                }`}
+              >
+                <div className="mb-4">
+                  <label className="mb-1.5 block text-[10px] font-mono uppercase tracking-[0.12em] text-[#6B7280]">
+                    Data de início da execução
+                  </label>
+                  <DatePicker
+                    value={data.dataInicioExecucao}
+                    onChange={(value) =>
+                      updateField('dataInicioExecucao', value)
+                    }
+                    placeholder="dd/mm/aaaa"
+                    accentColor="#7C3AED"
+                  />
+                </div>
+                {data.templateId === 'website' ? (
+                  <Field
+                    label="Prazo de entrega"
+                    value={data.prazoTotal}
+                    onChange={(value) => updateField('prazoTotal', value)}
+                    placeholder="Ex: 45 dias úteis"
+                  />
+                ) : null}
               </div>
 
               <SectionTitle
@@ -822,8 +837,22 @@ export default function Contrato({ onBack }: ContratoProps) {
                     <div className="mt-4">
                       <TextAreaField
                         label="Itens"
-                        value={data[section.key] as string}
-                        onChange={(value) => updateField(section.key, value)}
+                        value={getScopeFieldValue(data, section.key)}
+                        onChange={(value) => {
+                          if (
+                            data.templateId === 'website' &&
+                            section.key === 'scopeSobreNos'
+                          ) {
+                            setData((current) => ({
+                              ...current,
+                              scopeSobreNos: value,
+                              scopeCorpoClinico: '',
+                            }));
+                            return;
+                          }
+
+                          updateField(section.key, value);
+                        }}
                         rows={6}
                       />
                     </div>
