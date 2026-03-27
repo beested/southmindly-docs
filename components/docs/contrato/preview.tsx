@@ -91,6 +91,12 @@ export function ContractPreview({ data }: { data: ContratoData }) {
     data.responsabilidadesContratada,
   );
   const signatureLocation = data.cidadeAssinatura.trim() || 'Cidade não informada';
+  const todayLabel = new Intl.DateTimeFormat('pt-BR', {
+    day: 'numeric',
+    month: 'long',
+    year: 'numeric',
+    timeZone: 'America/Sao_Paulo',
+  }).format(new Date());
   const contratadaSignatureLabel =
     data.contratadaNome.trim() || southMindlyContractInfo.nome;
 
@@ -302,7 +308,7 @@ export function ContractPreview({ data }: { data: ContratoData }) {
               Assinaturas
             </div>
             <div className="mt-3 text-[14px] text-center text-[#374151]">
-              {signatureLocation}
+              {signatureLocation}, {todayLabel}
             </div>
 
             <div className="contract-signatures-grid mt-20 grid gap-12 print:grid-cols-2 md:grid-cols-2">
