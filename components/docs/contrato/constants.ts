@@ -284,7 +284,7 @@ const marketingDigitalDefaults: ContratoData = {
   paymentSummary:
     'O preço ajustado neste contrato será pago mensalmente, com vencimento no dia 15 de cada mês, sendo o primeiro vencimento em 15/03/2026.',
   paymentInstallmentClause:
-    'Obriga-se a CONTRATANTE a pagar mensalmente o valor de R$ 500,00 (quinhentos reais), iniciando em 01/03/2026, pelo período de 6 (seis) meses, referente ao serviço contratado.',
+    'Obriga-se a CONTRATANTE a pagar mensalmente, por meio de boleto bancário, o valor de R$ 600,00 (seiscentos reais), iniciando em 01/04/2026, pelo período de 6 (seis) meses, referente ao serviço contratado.',
   paymentRenewalClause:
     'O contrato vigorará pelo período mínimo inicial de 6 (seis) meses, com renovação automática por iguais períodos, salvo manifestação escrita em sentido contrário com antecedência mínima de 30 (trinta) dias. Os valores contratados poderão ser reajustados anualmente com base na variação acumulada do IPCA, ou por outro índice que venha a ser acordado entre as partes. Em caso de rescisão imotivada antes do término da vigência inicial, a CONTRATANTE ficará sujeita ao pagamento de multa compensatória equivalente a 50% (cinquenta por cento) do valor restante do contrato até o encerramento do prazo mínimo.',
   paymentDefaultClause:
