@@ -325,7 +325,7 @@ const marketingDigitalDefaults: ContratoData = {
   ].join('\n'),
   scopeFaq: '',
   scopeNovidades: [
-    'Envio de relatório mensal com os principais indicadores das ações executadas',
+    'Envio de relatório trimestral com os principais indicadores das ações executadas',
     'Apresentação de resultados, aprendizados e próximos passos',
   ].join('\n'),
   scopeContato: [
@@ -345,7 +345,6 @@ const marketingDigitalDefaults: ContratoData = {
     'Fornecer as características visuais e todo o material complementar, como textos, fotos, vídeos e logomarca, que sejam necessários à elaboração do projeto',
     'Assumir responsabilidade por todo conteúdo divulgado pela CONTRATADA',
     'Aprovar ou solicitar ajustes dos materiais enviados em até 2 (dois) dias úteis, a contar de cada encaminhamento',
-    'Providenciar os dados necessários para a execução dos serviços, podendo obtê-los mediante criação de credencial na plataforma correspondente ou por contato com o gerente do banco, quando aplicável',
     'Disponibilizar acessos, informações técnicas e verbas de mídia, quando aplicáveis, dentro dos prazos necessários à operação',
   ].join('\n'),
   responsabilidadesContratada: [
